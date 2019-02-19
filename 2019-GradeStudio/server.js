@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
 
+const cors = require('cors')
+app.use(cors())
+
 const fileUpload = require('express-fileupload')
 app.use(fileUpload())
 
@@ -12,13 +15,9 @@ const fse = require('fs-extra')
 
 const csvtojson = require('csvtojson')
 
-var uniqid = require('uniqid')
+const uniqid = require('uniqid')
 
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/views/index.html')
-})
-
-app.post('/uploadfile', function (req, res) {
+app.post('/uploadfile', function (req, res, next) {
   if (Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.')
   }
@@ -36,7 +35,6 @@ app.post('/uploadfile', function (req, res) {
       return res.status(500).send(err)
     } else {
       console.log(importfile)
-      console.log(uniqid())
       // console.log(importfile.data.toString('ascii'))
       fse.writeFile(__dirname + '/data/input/' + req.files.importfile.name, importfile.data, (err) => {
         if (err) {
@@ -47,27 +45,32 @@ app.post('/uploadfile', function (req, res) {
           csvtojson()
             .fromFile(csvFilePath)
             .then((jsonObj) => {
-              fse.writeJson(__dirname + '/data/output/001.json', jsonObj)
+              var fileid = uniqid()
+              console.log(fileid)
+              fse.writeJson(__dirname + '/data/output/' + fileid + '.json', jsonObj)
                 .then(() => {
-                  console.log(__dirname + '/data/output/001.json saved')
+                  console.log(__dirname + '/data/output/' + fileid + '.json saved')
+                  res.send(fileid)
                 })
                 .catch(err => {
                   console.error(err)
+                  res.status(500).send(err)
                 })
             })
         }
       })
-      res.redirect('/chart')
+      // res.redirect('/chart')
     }
   })
 })
 
-app.get('/chart', function (req, res) {
-  res.sendFile(__dirname + '/views/chart.html')
+app.get('/getfile/:filename', function (req, res) {
+  var filename = req.params.filename
+  res.sendFile(__dirname + '/data/output/' + filename + '.json')
 })
 
 app.use('*',function(req,res){
-  res.sendFile(__dirname + '/views/404.html');
+  res.sendFile(__dirname + '/views/404.html').status(404);
 })
 
 app.listen(3000, function () {

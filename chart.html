@@ -159,14 +159,14 @@
 
         alert("Selected from " + from + " to " + to);
 
-        let colorRange = xAxis.createSeriesRange(series);
+        let colorRange = axis.createSeriesRange(series);
         colorRange.category = from;
         colorRange.endCategory = to;
         colorRange.contents.stroke = am4core.color("#f00");
         colorRange.contents.fill = am4core.color("#f00");
         colorRange.contents.fillOpacity = 0.5;
 
-        // colorRang.validateNow();
+        chart.validateData();
         //chart.validateData();
         // chart.validateNow();
       });

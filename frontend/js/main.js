@@ -18,6 +18,7 @@ $(document).ready(function () {
           contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
           processData: false // NEEDED, DON'T OMIT THIS
         }).done(function (json) {
+            $('#fileUploadDiv').css('display', 'none')
             console.log(json);
 
             let data = [];
@@ -81,7 +82,7 @@ $(document).ready(function () {
               var from = axis.getPositionLabel(axis.toAxisPosition(range.start));
               var to = axis.getPositionLabel(axis.toAxisPosition(range.end));
 
-              alert("Selected from " + from + " to " + to);
+              // alert("Selected from " + from + " to " + to);
 
               var random_color = randomColor();
               console.log(random_color);

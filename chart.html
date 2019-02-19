@@ -156,17 +156,18 @@
         var axis = ev.target.chart.xAxes.getIndex(0);
         var from = axis.getPositionLabel(axis.toAxisPosition(range.start));
         var to = axis.getPositionLabel(axis.toAxisPosition(range.end));
+
         alert("Selected from " + from + " to " + to);
-        var colorRange = xAxis.createSeriesRange(series);
-        colorRange.value = from;
-        colorRange.endValue = to;
+
+        let colorRange = xAxis.createSeriesRange(series);
+        colorRange.category = from;
+        colorRange.endCategory = to;
         colorRange.contents.stroke = am4core.color("#f00");
         colorRange.contents.fill = am4core.color("#f00");
         colorRange.contents.fillOpacity = 0.5;
-        console.log(ev);
 
         // colorRang.validateNow();
-        // chart.validateData();
+        //chart.validateData();
         // chart.validateNow();
       });
 

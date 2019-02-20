@@ -1,6 +1,6 @@
 $(document).ready(function () {
   am4core.useTheme(am4themes_animated);
-  var chart = am4core.create('chartdiv', am4charts.XYChart);
+  var chart = am4core.create('chartDiv', am4charts.XYChart);
   var unselectedScore = [];
 
   $('#submitBtn').click(function () {
@@ -19,7 +19,7 @@ $(document).ready(function () {
           contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
           processData: false // NEEDED, DON'T OMIT THIS
         }).done(function (res) {
-            $('#chartdiv').css('display', 'block')
+            $('#chartDiv').css('display', 'block')
             $('#fileUploadDiv').css('display', 'none')
             console.log(res);
 

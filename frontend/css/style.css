@@ -1,4 +1,13 @@
+html, body {
+  height: 100%;
+  margin: 0px;
+}
+
+#fileUploadDiv {
+  height: 50%;
+}
 
 #chartDiv {
+  height: 60%;
   display: none;
 }

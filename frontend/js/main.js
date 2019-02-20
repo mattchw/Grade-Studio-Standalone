@@ -23,6 +23,7 @@ $(document).ready(function () {
             $('#fileUploadDiv').css('display', 'none')
             console.log(res);
 
+            let infoTable = [];
             let data = [];
             var scores = [];
             var mean = -1;
@@ -46,7 +47,16 @@ $(document).ready(function () {
               new_data.value = NormalDensityZx(scores[i], mean, stdDev);
               new_data.grade = '';
               data.push(new_data);
+              let infoTableElement = `<tr>
+                <th scope="row">${res[i].sid}</th>
+                <td></td>
+                <td>${res[i].score}</td>
+              </tr>`;
+              infoTable.push(infoTableElement);
             }
+
+            console.log(infoTable);
+            $('#infoTableDiv tbody').html(infoTable);
 
             console.table(data);
             chart.data = data;

@@ -1,7 +1,7 @@
 $(document).ready(function () {
   am4core.useTheme(am4themes_animated);
   var chart = am4core.create('chartdiv', am4charts.XYChart);
-  var selectedRanges = [];
+  var unselectedScore = [];
 
   $('#submitBtn').click(function () {
     var form = $('form')[0]; // You need to use standard javascript object here
@@ -30,6 +30,7 @@ $(document).ready(function () {
 
             for (let i in res) {
               scores.push(parseInt(res[i].score));
+              unselectedScore.push(parseInt(res[i].score));
             }
 
             mean = calculateMeanScore(scores);
@@ -85,18 +86,26 @@ $(document).ready(function () {
     var from = axis.getPositionLabel(axis.toAxisPosition(range.start));
     var to = axis.getPositionLabel(axis.toAxisPosition(range.end));
 
-    // alert("Selected from " + from + " to " + to);
+    console.log("Selected from " + from + " to " + to);
+    console.log(unselectedScore);
+    let fromIndex = unselectedScore.indexOf(parseInt(from));
+    let toIndex = unselectedScore.lastIndexOf(parseInt(to));
+    if (unselectedScore.indexOf(parseInt(from)) === -1 || unselectedScore.indexOf(parseInt(to)) === -1) {
+      alert('Selected Range Overlapped! Please Try Again.')
+    } else {
+      unselectedScore.splice(fromIndex, (toIndex - fromIndex + 1));
 
-    var random_color = randomColor();
-    console.log(random_color);
-    let colorRange = axis.createSeriesRange(series);
-    colorRange.category = from;
-    colorRange.endCategory = to;
-    colorRange.contents.stroke = am4core.color(random_color);
-    colorRange.contents.fill = am4core.color(random_color);
-    colorRange.contents.fillOpacity = 0.5;
+      var random_color = randomColor();
+      console.log(random_color);
+      let colorRange = axis.createSeriesRange(series);
+      colorRange.category = from;
+      colorRange.endCategory = to;
+      colorRange.contents.stroke = am4core.color(random_color);
+      colorRange.contents.fill = am4core.color(random_color);
+      colorRange.contents.fillOpacity = 0.5;
 
-    chart.validateData();
+      chart.validateData();
+    }
   });
 
   let scrollbarX = new am4charts.XYChartScrollbar();

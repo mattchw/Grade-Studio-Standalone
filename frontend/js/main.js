@@ -1,6 +1,7 @@
 $(document).ready(function () {
   am4core.useTheme(am4themes_animated);
   var chart = am4core.create('chartDiv', am4charts.XYChart);
+  var scores = [];
   var unselectedScore = [];
 
   $('#submitBtn').click(function () {
@@ -28,7 +29,7 @@ $(document).ready(function () {
 
             let infoTable = [];
             let data = [];
-            var scores = [];
+
             var mean = -1;
             var stdDev = -1;
 
@@ -48,7 +49,7 @@ $(document).ready(function () {
               new_data.sid = res[i].sid;
               new_data.score = res[i].score;
               new_data.value = NormalDensityZx(scores[i], mean, stdDev);
-              new_data.grade = '';
+              new_data.grade = 'A';
               data.push(new_data);
               let infoTableElement = `<tr>
                 <th scope="row">${res[i].sid}</th>
@@ -126,6 +127,10 @@ $(document).ready(function () {
   chart.scrollbarX = scrollbarX;
 
   chart.exporting.menu = new am4core.ExportMenu();
+
+  $('#clearBtn').click(function () {
+    //xAxis.axisRanges.clear();
+  })
 
 })
 

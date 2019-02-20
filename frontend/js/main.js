@@ -23,6 +23,9 @@ $(document).ready(function () {
             $('#fileUploadDiv').css('display', 'none')
             console.log(res);
 
+            //bubbleSort(res);
+            selectionSort(res);
+
             let infoTable = [];
             let data = [];
             var scores = [];
@@ -58,7 +61,7 @@ $(document).ready(function () {
             console.log(infoTable);
             $('#infoTableDiv tbody').html(infoTable);
 
-            console.table(data);
+            console.log(data);
             chart.data = data;
           });
       });
@@ -70,7 +73,7 @@ $(document).ready(function () {
   var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
   yAxis.dataFields.value = 'value';
   yAxis.min = 0;
-  yAxis.max = 0.1;
+  yAxis.max = 0.02;
 
   let series = chart.series.push(new am4charts.LineSeries());
   series.dataFields.categoryX = 'score';
@@ -161,4 +164,35 @@ function randomColor(){
     color += letters[Math.floor(Math.random() * 16)];
   }
   return color;
+}
+
+function bubbleSort(arr){
+   var len = arr.length;
+   for (var i = len-1; i>=0; i--){
+     for(var j = 1; j<=i; j++){
+       if(arr[j-1].score>=arr[j].score){
+           var temp = arr[j-1];
+           arr[j-1] = arr[j];
+           arr[j] = temp;
+        }
+     }
+   }
+   return arr;
+}
+
+function selectionSort(arr){
+  var minIdx, temp,
+      len = arr.length;
+  for(var i = 0; i < len; i++){
+    minIdx = i;
+    for(var  j = i+1; j<len; j++){
+       if(parseFloat(arr[j].score)< parseFloat(arr[minIdx].score)){
+          minIdx = j;
+       }
+    }
+    temp = arr[i];
+    arr[i] = arr[minIdx];
+    arr[minIdx] = temp;
+  }
+  return arr;
 }

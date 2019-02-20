@@ -21,6 +21,7 @@ $(document).ready(function () {
           processData: false // NEEDED, DON'T OMIT THIS
         }).done(function (res) {
             $('#chartDiv').css('display', 'block')
+            $('#infoTableDiv').css('display', 'block')
             $('#fileUploadDiv').css('display', 'none')
             console.log(res);
 
@@ -49,7 +50,7 @@ $(document).ready(function () {
               new_data.sid = res[i].sid;
               new_data.score = res[i].score;
               new_data.value = NormalDensityZx(scores[i], mean, stdDev);
-              new_data.grade = 'A';
+              new_data.grade = '';
               data.push(new_data);
               let infoTableElement = `<tr>
                 <th scope="row">${res[i].sid}</th>
@@ -58,8 +59,6 @@ $(document).ready(function () {
               </tr>`;
               infoTable.push(infoTableElement);
             }
-
-            console.log(infoTable);
             $('#infoTableDiv tbody').html(infoTable);
 
             console.log(data);
@@ -95,6 +94,7 @@ $(document).ready(function () {
   chart.cursor.lineY.disabled = true;
   chart.cursor.behavior = 'selectX';
   chart.cursor.events.on('selectended', function (ev) {
+    $('.gradeBtn').off('click');
     var range = ev.target.xRange;
     var axis = ev.target.chart.xAxes.getIndex(0);
     var from = axis.getPositionLabel(axis.toAxisPosition(range.start));
@@ -102,23 +102,48 @@ $(document).ready(function () {
 
     console.log("Selected from " + from + " to " + to);
     console.log(unselectedScore);
-    let fromIndex = unselectedScore.indexOf(parseInt(from));
-    let toIndex = unselectedScore.lastIndexOf(parseInt(to));
+    var fromIndex = unselectedScore.indexOf(parseInt(from));
+    var toIndex = unselectedScore.lastIndexOf(parseInt(to));
     if (unselectedScore.indexOf(parseInt(from)) === -1 || unselectedScore.indexOf(parseInt(to)) === -1) {
       alert('Selected Range Overlapped! Please Try Again.')
     } else {
-      unselectedScore.splice(fromIndex, (toIndex - fromIndex + 1));
+      $('#gradeModal').modal('show');
 
-      var random_color = randomColor();
-      console.log(random_color);
-      let colorRange = axis.createSeriesRange(series);
-      colorRange.category = from;
-      colorRange.endCategory = to;
-      colorRange.contents.stroke = am4core.color(random_color);
-      colorRange.contents.fill = am4core.color(random_color);
-      colorRange.contents.fillOpacity = 0.5;
+      $('.gradeBtn').on('click', function () {
+        var infoTable = [];
+        var gradeVal = $(this).html();
+        for (let i = scores.indexOf(parseInt(from)); i <= scores.indexOf(parseInt(to)); i++) {
+          chart.data[i].grade = gradeVal;
+        }
 
-      chart.validateData();
+        console.table(chart.data);
+
+        unselectedScore.splice(fromIndex, (toIndex - fromIndex + 1));
+        console.log(unselectedScore);
+
+        var random_color = randomColor();
+        console.log(random_color);
+        let colorRange = axis.createSeriesRange(series);
+        colorRange.category = from;
+        colorRange.endCategory = to;
+        colorRange.contents.stroke = am4core.color(random_color);
+        colorRange.contents.fill = am4core.color(random_color);
+        colorRange.contents.fillOpacity = 0.5;
+
+        for (let i = 0; i < chart.data.length; i++) {
+          let infoTableElement = `<tr>
+            <th scope="row">${chart.data[i].sid}</th>
+            <td>${chart.data[i].grade}</td>
+            <td>${chart.data[i].score}</td>
+          </tr>`;
+          infoTable.push(infoTableElement);
+        }
+        $('#infoTableDiv tbody').html(infoTable);
+
+        chart.validateData();
+        $('#gradeModal').modal('hide')
+      });
+
     }
   });
 
@@ -157,12 +182,12 @@ function standardDeviation (scores) {
   return stdDev;
 }
 
-function NormalDensityZx( x, Mean, StdDev ) {
+function NormalDensityZx (x, Mean, StdDev) {
   var a = x - Mean;
   return Math.exp( -( a * a ) / ( 2 * StdDev * StdDev ) ) / ( Math.sqrt( 2 * Math.PI ) * StdDev );
 }
 
-function randomColor(){
+function randomColor () {
   var letters = '0123456789ABCDEF';
   var color = '#';
   for (var i = 0; i < 6; i++ ) {
@@ -171,11 +196,11 @@ function randomColor(){
   return color;
 }
 
-function bubbleSort(arr){
+function bubbleSort (arr) {
    var len = arr.length;
-   for (var i = len-1; i>=0; i--){
-     for(var j = 1; j<=i; j++){
-       if(arr[j-1].score>=arr[j].score){
+   for (var i = len-1; i >= 0; i--) {
+     for (var j = 1; j <= i; j++) {
+       if (arr[j-1].score >= arr[j].score) {
            var temp = arr[j-1];
            arr[j-1] = arr[j];
            arr[j] = temp;
@@ -185,13 +210,13 @@ function bubbleSort(arr){
    return arr;
 }
 
-function selectionSort(arr){
+function selectionSort (arr) {
   var minIdx, temp,
       len = arr.length;
-  for(var i = 0; i < len; i++){
+  for (var i = 0; i < len; i++) {
     minIdx = i;
-    for(var  j = i+1; j<len; j++){
-       if(parseFloat(arr[j].score)< parseFloat(arr[minIdx].score)){
+    for (var j = i + 1; j < len; j++) {
+       if (parseFloat(arr[j].score) < parseFloat(arr[minIdx].score)) {
           minIdx = j;
        }
     }

@@ -4,10 +4,14 @@ html, body {
 }
 
 #fileUploadDiv {
-  height: 50%;
+  height: 92%;
 }
 
 #chartDiv {
   height: 60%;
+  display: none;
+}
+
+#infoTableDiv {
   display: none;
 }

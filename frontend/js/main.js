@@ -99,6 +99,8 @@ $(document).ready(function () {
             let scrollbarX = new am4charts.XYChartScrollbar();
             scrollbarX.series.push(series);
             chart.scrollbarX = scrollbarX;
+
+            chart.exporting.menu = new am4core.ExportMenu();
           });
       });
   })

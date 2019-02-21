@@ -163,6 +163,24 @@ $(document).ready(function () {
 
 })
 
+window.onscroll = function () {
+  scrollFunction()
+};
+
+function scrollFunction () {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    $('#backToTopBtn').css('display', 'block')
+  } else {
+    $('#backToTopBtn').css('display', 'none')
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction () {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+}
+
 function calculateMeanScore (scores) {
   var total = 0.0;
   for (var i = 0; i < scores.length; i++) {

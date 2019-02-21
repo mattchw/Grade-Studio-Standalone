@@ -69,11 +69,15 @@ $(document).ready(function () {
 
   var xAxis = chart.xAxes.push(new am4charts.CategoryAxis());
   xAxis.dataFields.category = 'score';
+  xAxis.title.text = 'Score';
+  xAxis.title.fontWeight = 600;
 
   var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
   yAxis.dataFields.value = 'value';
   yAxis.min = 0;
   yAxis.max = 0.02;
+  yAxis.title.text = 'Standard Deviation';
+  yAxis.title.fontWeight = 600;
 
   let series = chart.series.push(new am4charts.LineSeries());
   series.dataFields.categoryX = 'score';

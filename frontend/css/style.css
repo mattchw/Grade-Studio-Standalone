@@ -7,6 +7,10 @@ html, body {
   height: 92%;
 }
 
+#fileSubmitDiv {
+  display: none;
+}
+
 #chartDiv {
   height: 60%;
   display: none;

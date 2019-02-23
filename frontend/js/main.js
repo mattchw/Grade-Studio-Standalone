@@ -1,10 +1,11 @@
 $(document).ready(function () {
   am4core.useTheme(am4themes_animated);
   var chart = am4core.create('chartDiv', am4charts.XYChart);
+  var targetFile = "";
   var scores = [];
   var unselectedScore = [];
 
-  $('#submitBtn').click(function () {
+  $('#uploadBtn').click(function () {
     var form = $('form')[0]; // You need to use standard javascript object here
     var formData = new FormData(form);
     $.ajax({
@@ -13,16 +14,24 @@ $(document).ready(function () {
       type: 'POST',
       contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
       processData: false // NEEDED, DON'T OMIT THIS
-    }).done(function (filename) {
+    }).done(function (data) {
+      $('#filename').text(data.inputname)
+      targetFile = data.filename
+      $('#fileUploadDiv').css('display', 'none')
+      $('#fileSubmitDiv').css('display', 'block')
+    })
+  })
+
+  $('#submitBtn').click(function () {
         $.ajax({
-          url: 'http://localhost:3000/getfile/' + filename,
+          url: 'http://localhost:3000/getfile/' + targetFile,
           type: 'GET',
           contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
           processData: false // NEEDED, DON'T OMIT THIS
         }).done(function (res) {
             $('#chartDiv').css('display', 'block')
             $('#infoTableDiv').css('display', 'block')
-            $('#fileUploadDiv').css('display', 'none')
+            $('#fileSubmitDiv').css('display', 'none')
             console.log(res);
 
             //bubbleSort(res);
@@ -64,7 +73,6 @@ $(document).ready(function () {
             console.log(data);
             chart.data = data;
           });
-      });
   })
 
   var xAxis = chart.xAxes.push(new am4charts.CategoryAxis());

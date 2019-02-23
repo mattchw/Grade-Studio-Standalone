@@ -50,7 +50,11 @@ app.post('/uploadfile', function (req, res, next) {
               fse.writeJson(__dirname + '/data/output/' + fileid + '.json', jsonObj)
                 .then(() => {
                   console.log(__dirname + '/data/output/' + fileid + '.json saved')
-                  res.send(fileid)
+                  var data = {
+                    inputname: req.files.importfile.name,
+                    filename: fileid
+                  }
+                  res.send(data)
                 })
                 .catch(err => {
                   console.error(err)

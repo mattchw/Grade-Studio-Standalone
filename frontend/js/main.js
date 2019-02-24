@@ -77,11 +77,15 @@ $(document).ready(function () {
 
   var xAxis = chart.xAxes.push(new am4charts.CategoryAxis());
   xAxis.dataFields.category = 'score';
+  xAxis.title.text = 'Score';
+  xAxis.title.fontWeight = 600;
 
   var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
   yAxis.dataFields.value = 'value';
   yAxis.min = 0;
   yAxis.max = 0.02;
+  yAxis.title.text = 'Standard Deviation';
+  yAxis.title.fontWeight = 600;
 
   let series = chart.series.push(new am4charts.LineSeries());
   series.dataFields.categoryX = 'score';
@@ -166,6 +170,24 @@ $(document).ready(function () {
   })
 
 })
+
+window.onscroll = function () {
+  scrollFunction()
+};
+
+function scrollFunction () {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    $('#backToTopBtn').css('display', 'block')
+  } else {
+    $('#backToTopBtn').css('display', 'none')
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction () {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+}
 
 function calculateMeanScore (scores) {
   var total = 0.0;

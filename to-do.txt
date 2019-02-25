@@ -1,0 +1,19 @@
+From Patrick:
+
+- adjust the Area easier
+- show statistics for each grade
+- label the axis
+- manual adjust on the grade
+- for demo purpose, don't show the real identity
+- CSV file - more control, like include all the sub-components, the weighting for each component
+- Also the meta data of the Grading work
+- Add more charts and statistics, e.g. Pie chart for the weighting
+- When user click on a student, the point will be on the chart
+- Sub-component comparison, e.g. good at mid-term, poor at final
+- Fix and Fuzzy boundary for the grading, e.g. +- 5% for Grade-A
+- Can explain to the student why eventually the point is at that position, relative to the whole class, 
+- Sub-component analysis, like many students are poor in Assignment-2
+- Send the analysis report to the student if the input is the email. 
+- To path the way for future learning analysis
+- auto detect the CSV data, e.g. only final scores, or with sub-component, or even with the expected distribution (fix or fuzzy, e.g. 5% will get A) etc.
+- add some basic checking on the CSV file

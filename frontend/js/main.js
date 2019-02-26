@@ -1,7 +1,6 @@
 $(document).ready(function () {
   am4core.useTheme(am4themes_animated);
   var chart = am4core.create('chartDiv', am4charts.XYChart);
-  var targetFile = "";
   var scores = [];
   var unselectedScore = [];
 
@@ -16,7 +15,7 @@ $(document).ready(function () {
       processData: false // NEEDED, DON'T OMIT THIS
     }).done(function (data) {
       $('#filename').text(data.inputname)
-      targetFile = data.filename
+      $('#filename').val(data.filename)
       $('#fileUploadDiv').css('display', 'none')
       $('#fileSubmitDiv').css('display', 'block')
     })
@@ -24,7 +23,7 @@ $(document).ready(function () {
 
   $('#submitBtn').click(function () {
         $.ajax({
-          url: 'http://localhost:3000/getfile/' + targetFile,
+          url: 'http://localhost:3000/getfile/' + $('#filename').val(),
           type: 'GET',
           contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
           processData: false // NEEDED, DON'T OMIT THIS

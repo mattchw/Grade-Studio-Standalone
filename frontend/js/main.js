@@ -22,6 +22,35 @@ $(document).ready(function () {
       $('#filename').val(data.filename)
       $('#fileUploadDiv').css('display', 'none')
       $('#fileSubmitDiv').css('display', 'block')
+      $.ajax({
+        url: 'http://localhost:3000/getfile/' + $('#filename').val(),
+        type: 'GET',
+        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+        processData: false // NEEDED, DON'T OMIT THIS
+      }).done(function (res) {
+          var settingTableEl = []
+          for (let i of Object.keys(res[0])) {
+            let settingTableRow = `<tr>
+              <th scope="row">${i}</th>
+              <td class="">
+                <select class="form-control" onchange="selectOnchange()">
+                  <option>Student ID</option>
+                  <option>Assignment</option>
+                  <option>Quiz</option>
+                  <option>Midterm</option>
+                  <option>Project</option>
+                  <option>Final</option>
+                  <option>Other</option>
+                </select>
+              </td>
+              <td>
+                <input class="form-control" id="exampleFormControlInput1">
+              </td>
+            </tr>`
+            settingTableEl.push(settingTableRow);
+          }
+          $('#settingTable tbody').html(settingTableEl);
+        });
     })
   })
 

@@ -1,10 +1,10 @@
 From Patrick:
 
 - adjust the Area easier
-- show statistics for each grade
-- label the axis
+- show statistics for each grade (done)
+- label the axis (done)
 - manual adjust on the grade
-- for demo purpose, don't show the real identity
+
 - CSV file - more control, like include all the sub-components, the weighting for each component
 - Also the meta data of the Grading work
 - Add more charts and statistics, e.g. Pie chart for the weighting

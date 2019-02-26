@@ -66,12 +66,30 @@
     <div id="chartDiv"></div>
     <div id="infoTableDiv">
       <!-- <button class="btn btn-primary mt-2" id="clearBtn">Clear</button> -->
-      <table class="table table-hover">
-        <thead>
+      <table class="table" id="statsTable">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Statistics</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Mean</th>
+            <td id="mean">50</td>
+          </tr>
+          <tr>
+            <th scope="row">Standard Deviation</th>
+            <td id="std">20</td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table table-hover" id="overallTable">
+        <thead class="thead-light">
           <tr>
             <th scope="col">SID</th>
-            <th scope="col">Grade</th>
             <th scope="col">Score</th>
+            <th scope="col">Grade</th>
           </tr>
         </thead>
         <tbody>

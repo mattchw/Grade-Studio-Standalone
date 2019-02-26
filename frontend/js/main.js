@@ -2,6 +2,10 @@ $(document).ready(function () {
   am4core.useTheme(am4themes_animated);
   var chart = am4core.create('chartDiv', am4charts.XYChart);
   var scores = [];
+
+  var mean = -1;
+  var stdDev = -1;
+
   var unselectedScore = [];
 
   $('#uploadBtn').click(function () {
@@ -39,18 +43,17 @@ $(document).ready(function () {
             let infoTable = [];
             let data = [];
 
-            var mean = -1;
-            var stdDev = -1;
-
             for (let i in res) {
               scores.push(parseInt(res[i].score));
               unselectedScore.push(parseInt(res[i].score));
             }
 
             mean = calculateMeanScore(scores);
+            $('#mean').html(mean);
             console.log(mean);
 
             stdDev = standardDeviation(scores);
+            $('#std').html(stdDev);
             console.log(stdDev);
 
             for (let i = 0; i < res.length; i++) {
@@ -62,111 +65,126 @@ $(document).ready(function () {
               data.push(new_data);
               let infoTableElement = `<tr>
                 <th scope="row">${res[i].sid}</th>
-                <td></td>
                 <td>${res[i].score}</td>
+                <td></td>
               </tr>`;
               infoTable.push(infoTableElement);
             }
-            $('#infoTableDiv tbody').html(infoTable);
+            $('#overallTable tbody').html(infoTable);
 
             console.log(data);
             chart.data = data;
+
+            initChart();
           });
   })
-
-  var xAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-  xAxis.dataFields.category = 'score';
-  xAxis.title.text = 'Score';
-  xAxis.title.fontWeight = 600;
-
-  var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
-  yAxis.dataFields.value = 'value';
-  yAxis.min = 0;
-  yAxis.max = 0.02;
-  yAxis.title.text = 'Standard Deviation';
-  yAxis.title.fontWeight = 600;
-
-  let series = chart.series.push(new am4charts.LineSeries());
-  series.dataFields.categoryX = 'score';
-  series.dataFields.valueY = 'value';
-  series.tooltipText = '{valueY.value}';
-
-  var bullet = series.bullets.push(new am4charts.Bullet());
-  var square = bullet.createChild(am4core.Rectangle);
-  square.width = 10;
-  square.height = 10;
-
-  chart.cursor = new am4charts.XYCursor();
-  chart.cursor.lineX.stroke = am4core.color("#006eff");
-  chart.cursor.lineX.strokeWidth = 3;
-  chart.cursor.lineX.strokeOpacity = 0.3;
-  chart.cursor.lineX.strokeDasharray = "";
-  // disabling lineY
-  chart.cursor.lineY.disabled = true;
-  chart.cursor.behavior = 'selectX';
-  chart.cursor.events.on('selectended', function (ev) {
-    $('.gradeBtn').off('click');
-    var range = ev.target.xRange;
-    var axis = ev.target.chart.xAxes.getIndex(0);
-    var from = axis.getPositionLabel(axis.toAxisPosition(range.start));
-    var to = axis.getPositionLabel(axis.toAxisPosition(range.end));
-
-    console.log("Selected from " + from + " to " + to);
-    console.log(unselectedScore);
-    var fromIndex = unselectedScore.indexOf(parseInt(from));
-    var toIndex = unselectedScore.lastIndexOf(parseInt(to));
-    if (unselectedScore.indexOf(parseInt(from)) === -1 || unselectedScore.indexOf(parseInt(to)) === -1) {
-      alert('Selected Range Overlapped! Please Try Again.')
-    } else {
-      $('#gradeModal').modal('show');
-
-      $('.gradeBtn').on('click', function () {
-        var infoTable = [];
-        var gradeVal = $(this).html();
-        for (let i = scores.indexOf(parseInt(from)); i <= scores.indexOf(parseInt(to)); i++) {
-          chart.data[i].grade = gradeVal;
-        }
-
-        console.table(chart.data);
-
-        unselectedScore.splice(fromIndex, (toIndex - fromIndex + 1));
-        console.log(unselectedScore);
-
-        var random_color = randomColor();
-        console.log(random_color);
-        let colorRange = axis.createSeriesRange(series);
-        colorRange.category = from;
-        colorRange.endCategory = to;
-        colorRange.contents.stroke = am4core.color(random_color);
-        colorRange.contents.fill = am4core.color(random_color);
-        colorRange.contents.fillOpacity = 0.5;
-
-        for (let i = 0; i < chart.data.length; i++) {
-          let infoTableElement = `<tr>
-            <th scope="row">${chart.data[i].sid}</th>
-            <td>${chart.data[i].grade}</td>
-            <td>${chart.data[i].score}</td>
-          </tr>`;
-          infoTable.push(infoTableElement);
-        }
-        $('#infoTableDiv tbody').html(infoTable);
-
-        chart.validateData();
-        $('#gradeModal').modal('hide')
-      });
-
-    }
-  });
-
-  let scrollbarX = new am4charts.XYChartScrollbar();
-  scrollbarX.series.push(series);
-  chart.scrollbarX = scrollbarX;
-
-  chart.exporting.menu = new am4core.ExportMenu();
 
   $('#clearBtn').click(function () {
     //xAxis.axisRanges.clear();
   })
+
+  function initChart() {
+    var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
+    xAxis.dataFields.value = 'score';
+    xAxis.strictMinMax = true;
+    xAxis.min = -5;
+    xAxis.max = 105;
+    xAxis.title.text = 'Score';
+    xAxis.title.fontWeight = 600;
+
+    var meanRange = xAxis.axisRanges.create();
+    meanRange.value = mean;
+    meanRange.grid.stroke = am4core.color("#396478");
+    meanRange.grid.strokeWidth = 2;
+    meanRange.grid.strokeOpacity = 1;
+    meanRange.label.text = "Mean";
+    meanRange.label.fill = meanRange.grid.stroke;
+
+    var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    yAxis.dataFields.value = 'value';
+    yAxis.min = 0;
+    yAxis.max = 0.02;
+    yAxis.title.text = 'Normal Density';
+    yAxis.title.fontWeight = 600;
+
+    let series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.valueX = 'score';
+    series.dataFields.valueY = 'value';
+    series.tooltipText = '{valueY.value}';
+
+    var bullet = series.bullets.push(new am4charts.Bullet());
+    var square = bullet.createChild(am4core.Rectangle);
+    square.width = 5;
+    square.height = 5;
+
+    chart.cursor = new am4charts.XYCursor();
+    chart.cursor.lineX.stroke = am4core.color("#006eff");
+    chart.cursor.lineX.strokeWidth = 3;
+    chart.cursor.lineX.strokeOpacity = 0.3;
+    chart.cursor.lineX.strokeDasharray = "";
+    // disabling lineY
+    chart.cursor.lineY.disabled = true;
+    chart.cursor.behavior = 'selectX';
+    chart.cursor.events.on('selectended', function (ev) {
+      $('.gradeBtn').off('click');
+      var range = ev.target.xRange;
+      var axis = ev.target.chart.xAxes.getIndex(0);
+      var from = axis.getPositionLabel(axis.toAxisPosition(range.start));
+      var to = axis.getPositionLabel(axis.toAxisPosition(range.end));
+
+      console.log("Selected from " + from + " to " + to);
+      console.log(unselectedScore);
+      var fromIndex = unselectedScore.indexOf(parseInt(from));
+      var toIndex = unselectedScore.lastIndexOf(parseInt(to));
+      if (unselectedScore.indexOf(parseInt(from)) === -1 || unselectedScore.indexOf(parseInt(to)) === -1) {
+        alert('Selected Range Overlapped! Please Try Again.')
+      } else {
+        $('#gradeModal').modal('show');
+
+        $('.gradeBtn').on('click', function () {
+          var infoTable = [];
+          var gradeVal = $(this).html();
+          for (let i = scores.indexOf(parseInt(from)); i <= scores.indexOf(parseInt(to)); i++) {
+            chart.data[i].grade = gradeVal;
+          }
+
+          console.table(chart.data);
+
+          unselectedScore.splice(fromIndex, (toIndex - fromIndex + 1));
+          console.log(unselectedScore);
+
+          var random_color = randomColor();
+          console.log(random_color);
+          let colorRange = axis.createSeriesRange(series);
+          colorRange.value = from;
+          colorRange.endValue= to;
+          colorRange.contents.stroke = am4core.color(random_color);
+          colorRange.contents.fill = am4core.color(random_color);
+          colorRange.contents.fillOpacity = 0.5;
+
+          for (let i = 0; i < chart.data.length; i++) {
+            let infoTableElement = `<tr>
+              <th scope="row">${chart.data[i].sid}</th>
+              <td>${chart.data[i].score}</td>
+              <td>${chart.data[i].grade}</td>
+            </tr>`;
+            infoTable.push(infoTableElement);
+          }
+          $('#overallTable tbody').html(infoTable);
+
+          chart.validateData();
+          $('#gradeModal').modal('hide')
+        });
+
+      }
+    });
+
+    let scrollbarX = new am4charts.XYChartScrollbar();
+    scrollbarX.series.push(series);
+    chart.scrollbarX = scrollbarX;
+
+    chart.exporting.menu = new am4core.ExportMenu();
+  }
 
 })
 

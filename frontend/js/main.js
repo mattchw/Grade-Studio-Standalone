@@ -23,8 +23,44 @@ $(document).ready(function () {
       $('#filename').val(data.filename)
       $('#fileUploadDiv').css('display', 'none')
       $('#fileSubmitDiv').css('display', 'block')
+      $.ajax({
+        url: 'http://localhost:3000/getfile/' + $('#filename').val(),
+        type: 'GET',
+        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+        processData: false // NEEDED, DON'T OMIT THIS
+      }).done(function (res) {
+          var settingTableEl = []
+          for (let i in Object.keys(res[0])) {
+            let settingTableRow = `<tr>
+              <th scope="row">${Object.keys(res[0])[i]}</th>
+              <td class="">
+                <select class="form-control" onchange="selectOnchange(this)">
+                  <option>Ignore</option>
+                  <option>Student ID</option>
+                  <option>Assignment</option>
+                  <option>Quiz</option>
+                  <option>Midterm</option>
+                  <option>Project</option>
+                  <option>Final</option>
+                  <option>Overall</option>
+                </select>
+              </td>
+              <td>
+                <input class="form-control" id="weighting-${i}" disabled="true" type="number" min="1" max="100">
+              </td>
+            </tr>`
+            settingTableEl.push(settingTableRow);
+          }
+          $('#settingTable tbody').html(settingTableEl);
+        });
     })
   })
+
+  $('#resetWeightBtn').click(function () {
+    $('table#settingTable tr input').each(function () {
+      $(this).val('');
+    });
+  });
 
   $('#submitBtn').click(function () {
         $.ajax({
@@ -33,51 +69,78 @@ $(document).ready(function () {
           contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
           processData: false // NEEDED, DON'T OMIT THIS
         }).done(function (res) {
-            $('#chartDiv').css('display', 'block')
-            $('#gradeOption').css('display', 'block')
-            $('#infoTableDiv').css('display', 'block')
-            $('#fileSubmitDiv').css('display', 'none')
-            console.log(res);
+            var tableWeighting = 0;
+            $('table#settingTable tr input').each(function () {
+              if (isNaN(parseInt($(this).val())) === false) {
+                let percentage = parseInt($(this).val());
+                tableWeighting += percentage;
+              }
+            });
+            if (tableWeighting > 100) {
+              alert('Total weighting over 100%. Please check again.');
+            } else if (tableWeighting <= 0) {
+              alert('Wrong Weighting! Please Check Again.');
+            } else if (tableWeighting !== 100) {
+              alert('Toal weighting not equal to 100%. Please check again.');
+            } else {
+              // var chartData = new Object();
+              // var jsonData = {};
+              // $('table#settingTable tr th').each(function () {
+              //   jsonData[$(this).text]
+              // });
+              // columnsResult.forEach(function(column) {
+              //     var columnName = column.metadata.colName;
+              //     jsonData[columnName] = column.value;
+              // });
+              // viewData.employees.push(jsonData);
 
-            //bubbleSort(res);
-            selectionSort(res);
 
-            let infoTable = [];
-            let data = [];
+              $('#chartDiv').css('display', 'block')
+              $('#gradeOption').css('display', 'block')
+              $('#infoTableDiv').css('display', 'block')
+              $('#fileSubmitDiv').css('display', 'none')
+              console.log(res);
 
-            for (let i in res) {
-              scores.push(parseInt(res[i].score));
-              unselectedScore.push(parseInt(res[i].score));
+              //bubbleSort(res);
+              selectionSort(res);
+
+              let infoTable = [];
+              let data = [];
+
+              for (let i in res) {
+                scores.push(parseInt(res[i].score));
+                unselectedScore.push(parseInt(res[i].score));
+              }
+
+              mean = calculateMeanScore(scores);
+              $('#mean').html(mean);
+              console.log(mean);
+
+              stdDev = standardDeviation(scores);
+              $('#std').html(stdDev);
+              console.log(stdDev);
+
+              for (let i = 0; i < res.length; i++) {
+                var new_data = {};
+                new_data.sid = res[i].sid;
+                new_data.score = res[i].score;
+                new_data.value = NormalDensityZx(scores[i], mean, stdDev);
+                new_data.grade = '';
+                data.push(new_data);
+                let infoTableElement = `<tr>
+                  <th scope="row">${res[i].sid}</th>
+                  <td>${res[i].score}</td>
+                  <td></td>
+                </tr>`;
+                infoTable.push(infoTableElement);
+              }
+              $('#overallTable tbody').html(infoTable);
+
+              console.log(data);
+              chart.data = data;
+
+              initChart();
             }
-
-            mean = calculateMeanScore(scores);
-            $('#mean').html(mean);
-            console.log(mean);
-
-            stdDev = standardDeviation(scores);
-            $('#std').html(stdDev);
-            console.log(stdDev);
-
-            for (let i = 0; i < res.length; i++) {
-              var new_data = {};
-              new_data.sid = res[i].sid;
-              new_data.score = res[i].score;
-              new_data.value = NormalDensityZx(scores[i], mean, stdDev);
-              new_data.grade = '';
-              data.push(new_data);
-              let infoTableElement = `<tr>
-                <th scope="row">${res[i].sid}</th>
-                <td>${res[i].score}</td>
-                <td></td>
-              </tr>`;
-              infoTable.push(infoTableElement);
-            }
-            $('#overallTable tbody').html(infoTable);
-
-            console.log(data);
-            chart.data = data;
-
-            initChart();
           });
   })
 
@@ -388,4 +451,13 @@ function selectionSort (arr) {
     arr[minIdx] = temp;
   }
   return arr;
+}
+
+function selectOnchange(elmt) {
+  if ($(elmt).val() === 'Student ID' || $(elmt).val() === 'Ignore') {
+    $(elmt).closest('td').next().find('input').val('');
+    $(elmt).closest('td').next().find('input').prop('disabled', true);
+  } else {
+    $(elmt).closest('td').next().find('input').prop('disabled', false);
+  }
 }

@@ -17,3 +17,7 @@ From Patrick:
 - To path the way for future learning analysis
 - auto detect the CSV data, e.g. only final scores, or with sub-component, or even with the expected distribution (fix or fuzzy, e.g. 5% will get A) etc.
 - add some basic checking on the CSV file
+- save the state for next time
+- export data for education platforms (e.g. moodle)
+- preset weighting for users in setting page
+- select area function has bug: B's area covers C's area

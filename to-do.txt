@@ -1,6 +1,6 @@
 From Patrick:
 
-- adjust the Area easier
+- adjust the Area easier (done)
 - show statistics for each grade (done)
 - label the axis (done)
 - manual adjust on the grade

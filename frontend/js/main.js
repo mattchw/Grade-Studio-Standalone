@@ -2,6 +2,7 @@ $(document).ready(function () {
   am4core.useTheme(am4themes_animated);
   var chart = am4core.create('chartDiv', am4charts.XYChart);
   var scores = [];
+  var gradeRange = [];
 
   var mean = -1;
   var stdDev = -1;
@@ -33,6 +34,7 @@ $(document).ready(function () {
           processData: false // NEEDED, DON'T OMIT THIS
         }).done(function (res) {
             $('#chartDiv').css('display', 'block')
+            $('#gradeOption').css('display', 'block')
             $('#infoTableDiv').css('display', 'block')
             $('#fileSubmitDiv').css('display', 'none')
             console.log(res);
@@ -129,53 +131,142 @@ $(document).ready(function () {
       $('.gradeBtn').off('click');
       var range = ev.target.xRange;
       var axis = ev.target.chart.xAxes.getIndex(0);
+      console.log("start: "+range.start+" end: "+range.end)
       var from = axis.getPositionLabel(axis.toAxisPosition(range.start));
       var to = axis.getPositionLabel(axis.toAxisPosition(range.end));
 
       console.log("Selected from " + from + " to " + to);
-      console.log(unselectedScore);
-      var fromIndex = unselectedScore.indexOf(parseInt(from));
-      var toIndex = unselectedScore.lastIndexOf(parseInt(to));
-      if (unselectedScore.indexOf(parseInt(from)) === -1 || unselectedScore.indexOf(parseInt(to)) === -1) {
-        alert('Selected Range Overlapped! Please Try Again.')
-      } else {
-        $('#gradeModal').modal('show');
-
-        $('.gradeBtn').on('click', function () {
-          var infoTable = [];
-          var gradeVal = $(this).html();
-          for (let i = scores.indexOf(parseInt(from)); i <= scores.indexOf(parseInt(to)); i++) {
-            chart.data[i].grade = gradeVal;
+      //console.log(unselectedScore);
+      // var fromIndex = unselectedScore.indexOf(parseInt(from));
+      // var toIndex = unselectedScore.lastIndexOf(parseInt(to));
+      // if (unselectedScore.indexOf(parseInt(from)) === -1 || unselectedScore.indexOf(parseInt(to)) === -1) {
+      //   alert('Selected Range Overlapped! Please Try Again.')
+      // } else {
+      //   $('#gradeModal').modal('show');
+      //
+      //   $('.gradeBtn').on('click', function () {
+      //     var infoTable = [];
+      //     var gradeVal = $(this).html();
+      //     for (let i = scores.indexOf(parseInt(from)); i <= scores.indexOf(parseInt(to)); i++) {
+      //       chart.data[i].grade = gradeVal;
+      //     }
+      //
+      //     console.table(chart.data);
+      //
+      //     unselectedScore.splice(fromIndex, (toIndex - fromIndex + 1));
+      //     console.log(unselectedScore);
+      //
+      //     var random_color = randomColor();
+      //     console.log(random_color);
+      //     let colorRange = axis.createSeriesRange(series);
+      //     colorRange.value = from;
+      //     colorRange.endValue= to;
+      //     colorRange.contents.stroke = am4core.color(random_color);
+      //     colorRange.contents.fill = am4core.color(random_color);
+      //     colorRange.contents.fillOpacity = 0.5;
+      //
+      //     for (let i = 0; i < chart.data.length; i++) {
+      //       let infoTableElement = `<tr>
+      //         <th scope="row">${chart.data[i].sid}</th>
+      //         <td>${chart.data[i].score}</td>
+      //         <td>${chart.data[i].grade}</td>
+      //       </tr>`;
+      //       infoTable.push(infoTableElement);
+      //     }
+      //     $('#overallTable tbody').html(infoTable);
+      //
+      //     chart.validateData();
+      //     $('#gradeModal').modal('hide')
+      //   });
+      //
+      // }
+      var radioValue = $("input[name='options']:checked").val();
+      if (gradeRange.length!=0){
+        var occupied = -1;
+        for (var i in gradeRange){
+          // check whether this range is occupied or not
+          if(gradeRange[i].label.text==radioValue){
+            if((from>=gradeRange[i].value&&from<=gradeRange[i].endValue)||(to>=gradeRange[i].value&&to<=gradeRange[i].endValue)){
+              occupied = i;
+              break;
+            }
           }
-
-          console.table(chart.data);
-
-          unselectedScore.splice(fromIndex, (toIndex - fromIndex + 1));
-          console.log(unselectedScore);
-
-          var random_color = randomColor();
-          console.log(random_color);
+        }
+        if (occupied>-1){
+          console.log("It is occupied by "+gradeRange[occupied].label.text)
+          if((from>=gradeRange[occupied].value&&from<=gradeRange[occupied].endValue)){
+            gradeRange[occupied].endValue = to;
+            for (var i in gradeRange){
+              if(gradeRange[i].label.text!=radioValue){
+                if(gradeRange[occupied].endValue>=gradeRange[i].value&&gradeRange[occupied].endValue<=gradeRange[i].endValue){
+                  gradeRange[i].value=to;
+                  var count=0;
+                  scores.forEach(function(item, index){
+                    if(item>=gradeRange[i].value&&item<=gradeRange[i].endValue){
+                      count++;
+                    }
+                  })
+                  var prob = count / scores.length
+                  $('#gradeTable #'+gradeRange[i].label.text).html(prob);
+                }
+              }
+            }
+          } else if (to>=gradeRange[occupied].value&&to<=gradeRange[occupied].endValue) {
+            gradeRange[occupied].value = from;
+            for (var i in gradeRange){
+              if(gradeRange[i].label.text!=radioValue){
+                if(gradeRange[occupied].value>=gradeRange[i].value&&gradeRange[occupied].value<=gradeRange[i].endValue){
+                  gradeRange[i].endValue=from;
+                  var count=0;
+                  scores.forEach(function(item, index){
+                    if(item>=gradeRange[i].value&&item<=gradeRange[i].endValue){
+                      count++;
+                    }
+                  })
+                  var prob = count / scores.length
+                  $('#gradeTable #'+gradeRange[i].label.text).html(prob);
+                }
+              }
+            }
+          }
+        } else {
+          console.log("it is not occupied")
+          var selectedColor = selectColor(radioValue)
           let colorRange = axis.createSeriesRange(series);
           colorRange.value = from;
           colorRange.endValue= to;
-          colorRange.contents.stroke = am4core.color(random_color);
-          colorRange.contents.fill = am4core.color(random_color);
+          colorRange.label.text=radioValue;
+          colorRange.contents.stroke = am4core.color(selectedColor);
+          colorRange.contents.fill = am4core.color(selectedColor);
           colorRange.contents.fillOpacity = 0.5;
-
-          for (let i = 0; i < chart.data.length; i++) {
-            let infoTableElement = `<tr>
-              <th scope="row">${chart.data[i].sid}</th>
-              <td>${chart.data[i].score}</td>
-              <td>${chart.data[i].grade}</td>
-            </tr>`;
-            infoTable.push(infoTableElement);
-          }
-          $('#overallTable tbody').html(infoTable);
-
+          gradeRange.push(colorRange);
           chart.validateData();
-          $('#gradeModal').modal('hide')
-        });
-
+        }
+      } else {
+        var selectedColor = selectColor(radioValue)
+        console.log(selectedColor)
+        let colorRange = axis.createSeriesRange(series);
+        colorRange.value = from;
+        colorRange.endValue= to;
+        colorRange.label.text=radioValue;
+        colorRange.contents.stroke = am4core.color(selectedColor);
+        colorRange.contents.fill = am4core.color(selectedColor);
+        colorRange.contents.fillOpacity = 0.5;
+        gradeRange.push(colorRange);
+        chart.validateData();
+      }
+      // calculate prob
+      for (var i in gradeRange){
+        if(gradeRange[i].label.text==radioValue){
+          var count=0;
+          scores.forEach(function(item, index){
+            if(item>=gradeRange[i].value&&item<=gradeRange[i].endValue){
+              count++;
+            }
+          })
+          var prob = count / scores.length
+          $('#gradeTable #'+radioValue).html(prob);
+        }
       }
     });
 
@@ -240,6 +331,31 @@ function randomColor () {
   for (var i = 0; i < 6; i++ ) {
     color += letters[Math.floor(Math.random() * 16)];
   }
+  return color;
+}
+
+function selectColor (label) {
+  var gradeColor = {
+    "A+": "#0080ff",
+    "A": "#00bfff",
+    "A-": "#00ffff",
+    "B+": "#00ff00",
+    "B": "#80ff00",
+    "B-": "#bfff00",
+    "C+": "#ffff00",
+    "C": "#ffff66",
+    "C-": "#ffffb3",
+    "D+": "#ff8000",
+    "D": "#ffa64d",
+    "D-": "#ffbf80",
+    "F": "#ff0000"
+  }
+  var color = ""
+  Object.keys(gradeColor).forEach(function(key) {
+    if (key == label){
+      color = gradeColor[key]
+    }
+  })
   return color;
 }
 

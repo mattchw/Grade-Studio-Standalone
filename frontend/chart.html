@@ -64,8 +64,87 @@
     </div>
 
     <div id="chartDiv"></div>
+
+    <div id="gradeOption" class="btn-group btn-group-toggle" data-toggle="buttons">
+      <label class="btn btn-secondary active">
+        <input type="radio" name="options" value="F" autocomplete="off" checked> F
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="D-" autocomplete="off"> D-
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="D" autocomplete="off"> D
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="D+" autocomplete="off"> D+
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="C-" autocomplete="off"> C-
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="C" autocomplete="off"> C
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="C+" autocomplete="off"> C+
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="B-" autocomplete="off"> B-
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="B" autocomplete="off"> B
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="B+" autocomplete="off"> B+
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="A-" autocomplete="off"> A-
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="A" autocomplete="off"> A
+      </label>
+      <label class="btn btn-secondary">
+        <input type="radio" name="options" value="A+" autocomplete="off"> A+
+      </label>
+    </div>
+
     <div id="infoTableDiv">
       <!-- <button class="btn btn-primary mt-2" id="clearBtn">Clear</button> -->
+      <table class="table" id="gradeTable">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">F</th>
+            <th scope="col">D-</th>
+            <th scope="col">D</th>
+            <th scope="col">D+</th>
+            <th scope="col">C-</th>
+            <th scope="col">C</th>
+            <th scope="col">C+</th>
+            <th scope="col">B-</th>
+            <th scope="col">B</th>
+            <th scope="col">B+</th>
+            <th scope="col">A-</th>
+            <th scope="col">A</th>
+            <th scope="col">A+</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="F">0</th>
+            <td id="D-">0</td>
+            <td id="D">0</td>
+            <td id="D+">0</td>
+            <td id="C-">0</td>
+            <td id="C">0</td>
+            <td id="C+">0</td>
+            <td id="B-">0</td>
+            <td id="B">0</td>
+            <td id="B+">0</td>
+            <td id="A-">0</td>
+            <td id="A">0</td>
+            <td id="A+">0</td>
+          </tr>
+        </tbody>
+      </table>
       <table class="table" id="statsTable">
         <thead class="thead-dark">
           <tr>

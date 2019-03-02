@@ -5,6 +5,7 @@ Critical-Urgent:
     - Can calculate the overall score with weighting
     - Adjust Area bug: B's area covers C's area (fixed but needs more testing)
     - When user click on a student, the point will be on the chart (Can explain to the student why eventually the point is at that position, relative to the whole class)
+      (done)
 
 Critical-Low:
 - Step 1

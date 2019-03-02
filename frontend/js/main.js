@@ -148,6 +148,12 @@ $(document).ready(function () {
     //xAxis.axisRanges.clear();
   })
 
+  $('#overallTable tbody').click(function (e){
+    console.log("hi")
+    console.log(e)
+    moveCursor (chart, e.target.innerHTML)
+  })
+
   function initChart() {
     var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
     xAxis.dataFields.value = 'score';
@@ -316,6 +322,10 @@ $(document).ready(function () {
     scrollbarX.series.push(series);
     chart.scrollbarX = scrollbarX;
 
+    let scrollbarY = new am4charts.XYChartScrollbar();
+    scrollbarY.series.push(series);
+    chart.scrollbarY = scrollbarY;
+
     chart.exporting.menu = new am4core.ExportMenu();
   }
 
@@ -455,6 +465,18 @@ function updateAreaRatio (gradeRange, scores) {
     })
     var prob = count / scores.length
     $('#gradeTable #'+gradeRange[i].label.text).html(prob);
+  }
+}
+
+function moveCursor (chart, sid) {
+  for (var i in chart.data){
+    if (chart.data[i].sid==sid){
+      console.log("found "+sid)
+      topFunction();
+      let point = chart.xAxes.getIndex(0).valueToPoint(parseFloat(chart.data[i].score));
+      chart.cursor.triggerMove(point, "none");
+      break;
+    }
   }
 }
 

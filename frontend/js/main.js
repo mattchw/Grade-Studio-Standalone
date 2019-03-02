@@ -194,143 +194,122 @@ $(document).ready(function () {
       $('.gradeBtn').off('click');
       var range = ev.target.xRange;
       var axis = ev.target.chart.xAxes.getIndex(0);
-      console.log("start: "+range.start+" end: "+range.end)
       var from = axis.getPositionLabel(axis.toAxisPosition(range.start));
       var to = axis.getPositionLabel(axis.toAxisPosition(range.end));
 
       console.log("Selected from " + from + " to " + to);
-      //console.log(unselectedScore);
-      // var fromIndex = unselectedScore.indexOf(parseInt(from));
-      // var toIndex = unselectedScore.lastIndexOf(parseInt(to));
-      // if (unselectedScore.indexOf(parseInt(from)) === -1 || unselectedScore.indexOf(parseInt(to)) === -1) {
-      //   alert('Selected Range Overlapped! Please Try Again.')
-      // } else {
-      //   $('#gradeModal').modal('show');
-      //
-      //   $('.gradeBtn').on('click', function () {
-      //     var infoTable = [];
-      //     var gradeVal = $(this).html();
-      //     for (let i = scores.indexOf(parseInt(from)); i <= scores.indexOf(parseInt(to)); i++) {
-      //       chart.data[i].grade = gradeVal;
-      //     }
-      //
-      //     console.table(chart.data);
-      //
-      //     unselectedScore.splice(fromIndex, (toIndex - fromIndex + 1));
-      //     console.log(unselectedScore);
-      //
-      //     var random_color = randomColor();
-      //     console.log(random_color);
-      //     let colorRange = axis.createSeriesRange(series);
-      //     colorRange.value = from;
-      //     colorRange.endValue= to;
-      //     colorRange.contents.stroke = am4core.color(random_color);
-      //     colorRange.contents.fill = am4core.color(random_color);
-      //     colorRange.contents.fillOpacity = 0.5;
-      //
-      //     for (let i = 0; i < chart.data.length; i++) {
-      //       let infoTableElement = `<tr>
-      //         <th scope="row">${chart.data[i].sid}</th>
-      //         <td>${chart.data[i].score}</td>
-      //         <td>${chart.data[i].grade}</td>
-      //       </tr>`;
-      //       infoTable.push(infoTableElement);
-      //     }
-      //     $('#overallTable tbody').html(infoTable);
-      //
-      //     chart.validateData();
-      //     $('#gradeModal').modal('hide')
-      //   });
-      //
-      // }
+
       var radioValue = $("input[name='options']:checked").val();
-      if (gradeRange.length!=0){
-        var occupied = -1;
-        for (var i in gradeRange){
-          // check whether this range is occupied or not
-          if(gradeRange[i].label.text==radioValue){
+
+      let newInsert = -1;
+      let overlap   = -1;
+      let error     = false;
+      // check whether it is a new insert of Area
+      for (var i in gradeRange) {
+        if (gradeRange[i].label.text==radioValue) {
+          newInsert = i;
+          break;
+        }
+      }
+      if (newInsert>-1){ // it is not new insert. update exisiting area
+        console.log("it is not new");
+        // check whether it overlaps with other area
+        for (var i in gradeRange) {
+          // if (i == newInsert){
+          //   continue;
+          // }
             if((from>=gradeRange[i].value&&from<=gradeRange[i].endValue)||(to>=gradeRange[i].value&&to<=gradeRange[i].endValue)){
-              occupied = i;
+              overlap = i;
+              break;
+            }
+        }
+        if (overlap>-1) {
+          // overlap
+          console.log("overlap");
+          // check whether range cover other area
+          for (var i in gradeRange) {
+            if(from<=gradeRange[i].value&&to>=gradeRange[i].endValue){
+              error = true;
               break;
             }
           }
-        }
-        if (occupied>-1){
-          console.log("It is occupied by "+gradeRange[occupied].label.text)
-          if((from>=gradeRange[occupied].value&&from<=gradeRange[occupied].endValue)){
-            gradeRange[occupied].endValue = to;
-            for (var i in gradeRange){
-              if(gradeRange[i].label.text!=radioValue){
-                if(gradeRange[occupied].endValue>=gradeRange[i].value&&gradeRange[occupied].endValue<=gradeRange[i].endValue){
-                  gradeRange[i].value=to;
-                  var count=0;
-                  scores.forEach(function(item, index){
-                    if(item>=gradeRange[i].value&&item<=gradeRange[i].endValue){
-                      count++;
-                    }
-                  })
-                  var prob = count / scores.length
-                  $('#gradeTable #'+gradeRange[i].label.text).html(prob);
-                }
-              }
-            }
-          } else if (to>=gradeRange[occupied].value&&to<=gradeRange[occupied].endValue) {
-            gradeRange[occupied].value = from;
-            for (var i in gradeRange){
-              if(gradeRange[i].label.text!=radioValue){
-                if(gradeRange[occupied].value>=gradeRange[i].value&&gradeRange[occupied].value<=gradeRange[i].endValue){
-                  gradeRange[i].endValue=from;
-                  var count=0;
-                  scores.forEach(function(item, index){
-                    if(item>=gradeRange[i].value&&item<=gradeRange[i].endValue){
-                      count++;
-                    }
-                  })
-                  var prob = count / scores.length
-                  $('#gradeTable #'+gradeRange[i].label.text).html(prob);
-                }
-              }
-            }
+          if (error) {
+            console.log("not new & overlap but covering other area")
+          } else {
+            console.log("not new & overlap but not covering other area")
+            console.log("newInsert: "+newInsert+" overlap: "+overlap)
+            console.log("INSERT")
           }
         } else {
-          console.log("it is not occupied")
-          var selectedColor = selectColor(radioValue)
-          let colorRange = axis.createSeriesRange(series);
-          colorRange.value = from;
-          colorRange.endValue= to;
-          colorRange.label.text=radioValue;
-          colorRange.contents.stroke = am4core.color(selectedColor);
-          colorRange.contents.fill = am4core.color(selectedColor);
-          colorRange.contents.fillOpacity = 0.5;
-          gradeRange.push(colorRange);
-          chart.validateData();
+          // not overlap
+          error = true;
+          console.log("not new but not overlap -> error");
         }
       } else {
-        var selectedColor = selectColor(radioValue)
-        console.log(selectedColor)
-        let colorRange = axis.createSeriesRange(series);
-        colorRange.value = from;
-        colorRange.endValue= to;
-        colorRange.label.text=radioValue;
-        colorRange.contents.stroke = am4core.color(selectedColor);
-        colorRange.contents.fill = am4core.color(selectedColor);
-        colorRange.contents.fillOpacity = 0.5;
-        gradeRange.push(colorRange);
-        chart.validateData();
-      }
-      // calculate prob
-      for (var i in gradeRange){
-        if(gradeRange[i].label.text==radioValue){
-          var count=0;
-          scores.forEach(function(item, index){
-            if(item>=gradeRange[i].value&&item<=gradeRange[i].endValue){
-              count++;
+        console.log("it is new");
+        // check whether it overlaps with other area
+        for (var i in gradeRange) {
+          if((from>=gradeRange[i].value&&from<=gradeRange[i].endValue)||(to>=gradeRange[i].value&&to<=gradeRange[i].endValue)){
+            overlap = i;
+            break;
+          }
+        }
+        if (overlap>-1) {
+          // overlap
+          console.log("new & overlap");
+          // check whether range cover other area
+          for (var i in gradeRange) {
+            console.log("Comparing "+from+" "+gradeRange[i].value+" "+to+" "+gradeRange[i].endValue)
+            if(from<=gradeRange[i].value&&to>=gradeRange[i].endValue){
+              error = true;
+              break;
             }
-          })
-          var prob = count / scores.length
-          $('#gradeTable #'+radioValue).html(prob);
+          }
+          if (error) {
+            console.log("new & overlap but covering other area")
+          } else {
+            console.log("new & overlap but not covering other area")
+            console.log("INSERT")
+          }
+        } else {
+          // not overlap
+          console.log("new but not overlap");
+          for (var i in gradeRange) {
+            console.log("Comparing "+from+" "+gradeRange[i].value+" "+to+" "+gradeRange[i].endValue)
+            if(from<=gradeRange[i].value&&to>=gradeRange[i].endValue){
+              error = true;
+              break;
+            }
+          }
+          if (error) {
+            console.log("new & not overlap but covering other area")
+          } else {
+            console.log("new & not overlap but not covering other area")
+            console.log("newInsert: "+newInsert+" overlap: "+overlap)
+            console.log("INSERT")
+          }
         }
       }
+      // start to update area after checking conditions
+      if (error) {
+        console.log("do not update the area")
+        alert("something went wrong");
+      } else {
+        if (newInsert>-1&&overlap>-1) {
+          // update existing area
+          updateTwoAreas (gradeRange, radioValue, newInsert, overlap, from, to)
+        } else if (newInsert==-1&&overlap>-1) {
+          // insert new area but update affected area
+          insertArea(chart, am4core, gradeRange, radioValue, axis, series, from, to)
+          //update area
+          updateArea (gradeRange, overlap, from, to)
+        } else if (newInsert==-1&&overlap==-1) {
+          // insert new area and do nothing
+          insertArea(chart, am4core, gradeRange, radioValue, axis, series, from, to)
+        }
+      }
+      // update area ratio
+      updateAreaRatio (gradeRange, scores)
     });
 
     let scrollbarX = new am4charts.XYChartScrollbar();
@@ -339,6 +318,8 @@ $(document).ready(function () {
 
     chart.exporting.menu = new am4core.ExportMenu();
   }
+
+
 
 })
 
@@ -360,6 +341,7 @@ function topFunction () {
   document.documentElement.scrollTop = 0;
 }
 
+/* Statistics Function */
 function calculateMeanScore (scores) {
   var total = 0.0;
   for (var i = 0; i < scores.length; i++) {
@@ -368,7 +350,6 @@ function calculateMeanScore (scores) {
 
   return (total / scores.length);
 }
-
 function standardDeviation (scores) {
   var avg = calculateMeanScore(scores);
 
@@ -382,21 +363,12 @@ function standardDeviation (scores) {
   var stdDev = Math.sqrt(avgSquareDiff);
   return stdDev;
 }
-
 function NormalDensityZx (x, Mean, StdDev) {
   var a = x - Mean;
   return Math.exp( -( a * a ) / ( 2 * StdDev * StdDev ) ) / ( Math.sqrt( 2 * Math.PI ) * StdDev );
 }
 
-function randomColor () {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++ ) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
-
+/* Chart Function */
 function selectColor (label) {
   var gradeColor = {
     "A+": "#0080ff",
@@ -421,21 +393,72 @@ function selectColor (label) {
   })
   return color;
 }
-
-function bubbleSort (arr) {
-   var len = arr.length;
-   for (var i = len-1; i >= 0; i--) {
-     for (var j = 1; j <= i; j++) {
-       if (arr[j-1].score >= arr[j].score) {
-           var temp = arr[j-1];
-           arr[j-1] = arr[j];
-           arr[j] = temp;
+function insertArea (chart, am4core, gradeRange, radioValue, axis, series, from, to) {
+    var selectedColor = selectColor(radioValue)
+    let colorRange = axis.createSeriesRange(series);
+    colorRange.value = from;
+    colorRange.endValue= to;
+    colorRange.label.text=radioValue;
+    colorRange.contents.stroke = am4core.color(selectedColor);
+    colorRange.contents.fill = am4core.color(selectedColor);
+    colorRange.contents.fillOpacity = 0.5;
+    gradeRange.push(colorRange);
+    chart.validateData();
+}
+function updateArea (gradeRange, overlap, from, to) {
+  if(from>=gradeRange[overlap].value&&from<=gradeRange[overlap].endValue){
+    gradeRange[overlap].endValue = from
+  } else if (to>=gradeRange[overlap].value&&to<=gradeRange[overlap].endValue) {
+    gradeRange[overlap].value = to
+  }
+}
+function updateTwoAreas (gradeRange, radioValue, newInsert, overlap, from, to) {
+  if (newInsert==overlap) {
+    if((from>=gradeRange[overlap].value&&from<=gradeRange[overlap].endValue)){
+      gradeRange[overlap].endValue = to;
+      for (var i in gradeRange){
+        if(gradeRange[i].label.text!=radioValue){
+          if(gradeRange[overlap].endValue>=gradeRange[i].value&&gradeRange[overlap].endValue<=gradeRange[i].endValue){
+            gradeRange[i].value=to;
+          }
         }
-     }
-   }
-   return arr;
+      }
+    } else if (to>=gradeRange[overlap].value&&to<=gradeRange[overlap].endValue) {
+      gradeRange[overlap].value = from;
+      for (var i in gradeRange){
+        if(gradeRange[i].label.text!=radioValue){
+          if(gradeRange[overlap].value>=gradeRange[i].value&&gradeRange[overlap].value<=gradeRange[i].endValue){
+            gradeRange[i].endValue=from;
+          }
+        }
+      }
+    }
+  } else {
+    if (gradeRange[newInsert].value>=gradeRange[overlap].value&&gradeRange[newInsert].value>=gradeRange[overlap].endValue) { //left
+      console.log("left")
+      gradeRange[newInsert].value = from
+      gradeRange[overlap].endValue = from
+    } else if (gradeRange[newInsert].endValue<=gradeRange[overlap].value&&gradeRange[newInsert].endValue<=gradeRange[overlap].endValue) {//right
+      console.log("right")
+      gradeRange[newInsert].endValue = to
+      gradeRange[overlap].value = to
+    }
+  }
+}
+function updateAreaRatio (gradeRange, scores) {
+  for (var i in gradeRange) {
+    var count=0;
+    scores.forEach(function(item, index){
+      if(item>=gradeRange[i].value&&item<=gradeRange[i].endValue){
+        count++;
+      }
+    })
+    var prob = count / scores.length
+    $('#gradeTable #'+gradeRange[i].label.text).html(prob);
+  }
 }
 
+/* Sorting */
 function selectionSort (arr) {
   var minIdx, temp,
       len = arr.length;

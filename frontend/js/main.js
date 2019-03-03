@@ -36,15 +36,15 @@ $(document).ready(function () {
             let settingTableRow = `<tr>
               <th scope="row">${Object.keys(res[0])[i]}</th>
               <td class="">
-                <select class="form-control" onchange="selectOnchange(this)">
-                  <option>Ignore</option>
-                  <option>Student ID</option>
-                  <option>Assignment</option>
-                  <option>Quiz</option>
-                  <option>Midterm</option>
-                  <option>Project</option>
-                  <option>Final</option>
-                  <option>Overall</option>
+                <select class="form-control columnTypeSelect" onchange="selectOnchange(this)">
+                  <option value="ignore">Ignore</option>
+                  <option value="sid">Student ID</option>
+                  <option value="assignment">Assignment</option>
+                  <option value="quiz">Quiz/Test</option>
+                  <option value="midterm">Midterm</option>
+                  <option value="proj">Project</option>
+                  <option value="final">Final</option>
+                  <option value="overall">Overall</option>
                 </select>
               </td>
               <td>
@@ -54,6 +54,7 @@ $(document).ready(function () {
             settingTableEl.push(settingTableRow);
           }
           $('#settingTable tbody').html(settingTableEl);
+          suggestSetting();
         });
     })
   })
@@ -145,7 +146,6 @@ $(document).ready(function () {
                 infoTable.push(infoTableElement);
               }
               $('#overallTable tbody').html(infoTable);
-
               console.log(data);
               chart.data = data;
 
@@ -509,10 +509,65 @@ function selectionSort (arr) {
 }
 
 function selectOnchange(elmt) {
+  console.log(elmt);
   if ($(elmt).val() === 'Student ID' || $(elmt).val() === 'Ignore') {
     $(elmt).closest('td').next().find('input').val('');
     $(elmt).closest('td').next().find('input').prop('disabled', true);
+  } else if ($(elmt).val() === 'Overall') {
+    $(elmt).closest('td').next().find('input').val(100);
+    $(elmt).closest('td').next().find('input').prop('disabled', false);
   } else {
     $(elmt).closest('td').next().find('input').prop('disabled', false);
   }
+}
+
+function suggestSetting() {
+  var overall = 100;
+  var weighting = [];
+  // $('#settingTable tbody tr').each(function (key, item) {
+  //   if ($(item).find('th').html().includes('sid') || $(item).find('th').html().includes('student')) {
+  //
+  //   } else if ($(item).find('th').html().includes('asg') || $(item).find('th').html().includes('assignment') || $(item).find('th').html().includes('hw') || $(item).find('th').html().includes('homework')) {
+  //     weighting.push('asg');
+  //   } else if ($(item).find('th').html().includes('midterm')) {
+  //     weighting.push('midterm');
+  //   } else if ($(item).find('th').html().includes('quiz') || $(item).find('th').html().includes('test')) {
+  //     weighting.push('quiz');
+  //   } else if ($(item).find('th').html().includes('proj')) {
+  //     weighting.push('proj');
+  //   } else if ($(item).find('th').html().includes('final') || $(item).find('th').html().includes('exam')) {
+  //     weighting.push('final');
+  //   } else if ($(item).find('th').html().includes('score')) {
+  //     weighting.push('score');
+  //   }
+  // });
+
+  $('#settingTable tbody tr').each(function (key, item) {
+    if ($(item).find('th').html().includes('sid') || $(item).find('th').html().includes('student')) {
+      $(item).find('select').val('sid');
+      $(item).find('input').val('');
+      $(item).find('input').prop('disabled', true);
+    } else if ($(item).find('th').html().includes('asg') || $(item).find('th').html().includes('assignment') || $(item).find('th').html().includes('hw') || $(item).find('th').html().includes('homework')) {
+      $(item).find('select').val('assignment');
+      $(item).find('input').prop('disabled', false);
+    } else if ($(item).find('th').html().includes('midterm')) {
+      $(item).find('select').val('midterm');
+      $(item).find('input').prop('disabled', false);
+    } else if ($(item).find('th').html().includes('quiz') || $(item).find('th').html().includes('test')) {
+      $(item).find('select').val('quiz');
+      $(item).find('input').prop('disabled', false);
+    } else if ($(item).find('th').html().includes('proj')) {
+      $(item).find('select').val('proj');
+      $(item).find('input').prop('disabled', false);
+    } else if ($(item).find('th').html().includes('final') || $(item).find('th').html().includes('exam')) {
+      $(item).find('select').val('final');
+      $(item).find('input').prop('disabled', false);
+    } else if ($(item).find('th').html().includes('score')) {
+      $(item).find('select').val('overall');
+      $(item).find('input').val(100);
+      $(item).find('input').prop('disabled', false);
+    } else {
+      $(item).find('select').val('ignore');
+    }
+  });
 }

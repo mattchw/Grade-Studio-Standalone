@@ -86,6 +86,29 @@ $(document).ready(function () {
             } else if (tableWeighting !== 100) {
               alert('Toal weighting not equal to 100%. Please check again.');
             } else {
+              // calculate weighted score
+              var inputWeighting = getWeighting();
+              var inputFields = getCsvFields();
+              var outputData = [];
+              console.log(inputWeighting);
+              console.log(inputFields);
+
+              res.forEach(function (student, index) {
+                let tmpScore = 0;
+                let studentObj = {};
+                for (let i = 0; i < inputFields.length; i++) {
+                  if (inputWeighting[i] === 0) {
+                    studentObj[inputFields[i]] = student[inputFields[i]];
+                  } else {
+                    tmpScore += inputWeighting[i] * student[inputFields[i]];
+                  }
+                }
+                studentObj['score'] = tmpScore;
+                // outputData.push(tmpScore);
+                outputData.push(studentObj);
+              });
+              // end of calculating weighted score
+
               // var chartData = new Object();
               // var jsonData = {};
               // $('table#settingTable tr th').each(function () {
@@ -102,45 +125,66 @@ $(document).ready(function () {
               $('#gradeOption').css('display', 'block')
               $('#infoTableDiv').css('display', 'block')
               $('#fileSubmitDiv').css('display', 'none')
-              console.log(res);
+              // console.log(res);
 
-              //bubbleSort(res);
-              selectionSort(res);
-
+              // selectionSort(res);
+              selectionSort(outputData);
               let infoTable = [];
               let data = [];
 
-              for (let i in res) {
-                scores.push(parseInt(res[i].score));
-                unselectedScore.push(parseInt(res[i].score));
+              // for (let i in res) {
+              //   scores.push(parseInt(res[i].score));
+              //   unselectedScore.push(parseInt(res[i].score));
+              // }
+              for (let i in outputData) {
+                scores.push(Number(outputData[i].score));
+                unselectedScore.push(Number(outputData[i].score));
               }
 
+              // mean = calculateMeanScore(scores);
               mean = calculateMeanScore(scores);
               $('#mean').html(mean);
-              console.log(mean);
+              console.log('mean: ' + mean);
 
+              // stdDev = standardDeviation(scores);
               stdDev = standardDeviation(scores);
               $('#std').html(stdDev);
-              console.log(stdDev);
+              console.log('stdDev: ' + stdDev);
 
+              // max = Math.max.apply(null, scores);
               max = Math.max.apply(null, scores);
               $('#max').html(max);
-              console.log(max);
+              console.log('max: ' + max);
 
+              // min = Math.min.apply(null, scores);
               min = Math.min.apply(null, scores);
               $('#min').html(min);
-              console.log(min);
+              console.log('min: ' + min);
 
-              for (let i = 0; i < res.length; i++) {
+              // for (let i = 0; i < res.length; i++) {
+              //   var new_data = {};
+              //   new_data.sid = res[i].sid;
+              //   new_data.score = res[i].score;
+              //   new_data.value = NormalDensityZx(scores[i], mean, stdDev);
+              //   new_data.grade = '';
+              //   data.push(new_data);
+              //   let infoTableElement = `<tr>
+              //     <th scope="row">${res[i].sid}</th>
+              //     <td>${res[i].score}</td>
+              //     <td></td>
+              //   </tr>`;
+              //   infoTable.push(infoTableElement);
+              // }
+              for (let i = 0; i < outputData.length; i++) {
                 var new_data = {};
-                new_data.sid = res[i].sid;
-                new_data.score = res[i].score;
+                new_data.sid = outputData[i].sid;
+                new_data.score = outputData[i].score;
                 new_data.value = NormalDensityZx(scores[i], mean, stdDev);
                 new_data.grade = '';
                 data.push(new_data);
                 let infoTableElement = `<tr>
-                  <th scope="row">${res[i].sid}</th>
-                  <td>${res[i].score}</td>
+                  <th scope="row">${outputData[i].sid}</th>
+                  <td>${outputData[i].score}</td>
                   <td></td>
                 </tr>`;
                 infoTable.push(infoTableElement);
@@ -572,6 +616,20 @@ function suggestSetting() {
   });
 }
 
-function calculateWeighting () {
+function getWeighting () {
+  var weighting = [];
+  $('#settingTable tbody tr').each(function (key, item) {
+    weighting.push(Number($(item).find('input').val()) / 100.0);
+  });
 
+  return weighting;
+}
+
+function getCsvFields () {
+  var fields = [];
+  $('#settingTable tbody tr').each(function (key, item) {
+    fields.push($(item).find('th').html());
+  });
+
+  return fields;
 }

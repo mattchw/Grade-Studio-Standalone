@@ -6,6 +6,8 @@ $(document).ready(function () {
 
   var mean = -1;
   var stdDev = -1;
+  var max = -1;
+  var min = -1;
 
   var unselectedScore = [];
 
@@ -119,6 +121,14 @@ $(document).ready(function () {
               stdDev = standardDeviation(scores);
               $('#std').html(stdDev);
               console.log(stdDev);
+
+              max = Math.max.apply(null, scores);
+              $('#max').html(max);
+              console.log(max);
+
+              min = Math.min.apply(null, scores);
+              $('#min').html(min);
+              console.log(min);
 
               for (let i = 0; i < res.length; i++) {
                 var new_data = {};

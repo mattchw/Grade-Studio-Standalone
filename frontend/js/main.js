@@ -510,10 +510,10 @@ function selectionSort (arr) {
 
 function selectOnchange(elmt) {
   console.log(elmt);
-  if ($(elmt).val() === 'Student ID' || $(elmt).val() === 'Ignore') {
+  if ($(elmt).val() === 'sid' || $(elmt).val() === 'ignore') {
     $(elmt).closest('td').next().find('input').val('');
     $(elmt).closest('td').next().find('input').prop('disabled', true);
-  } else if ($(elmt).val() === 'Overall') {
+  } else if ($(elmt).val() === 'overall') {
     $(elmt).closest('td').next().find('input').val(100);
     $(elmt).closest('td').next().find('input').prop('disabled', false);
   } else {
@@ -570,4 +570,8 @@ function suggestSetting() {
       $(item).find('select').val('ignore');
     }
   });
+}
+
+function calculateWeighting () {
+
 }

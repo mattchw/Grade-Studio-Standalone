@@ -143,12 +143,12 @@ $(document).ready(function () {
 
               // mean = calculateMeanScore(scores);
               mean = calculateMeanScore(scores);
-              $('#mean').html(mean);
+              $('#mean').html(mean.toFixed(4));
               console.log('mean: ' + mean);
 
               // stdDev = standardDeviation(scores);
               stdDev = standardDeviation(scores);
-              $('#std').html(stdDev);
+              $('#std').html(stdDev.toFixed(4));
               console.log('stdDev: ' + stdDev);
 
               // max = Math.max.apply(null, scores);
@@ -198,22 +198,29 @@ $(document).ready(function () {
           });
   })
 
-  $('#clearBtn').click(function () {
+  $('#gradeClearBtn').click(function () {
     //xAxis.axisRanges.clear();
+    for (var i in gradeRange){
+      chart.xAxes.getIndex(0).axisRanges.removeValue(gradeRange[i]);
+    }
+    gradeRange = [];
+  })
+
+  $('#gradeApplyBtn').click(function () {
+    //console.log(gradeRange);
+    setGrade (chart, gradeRange);
   })
 
   $('#overallTable tbody').click(function (e){
-    console.log("hi")
-    console.log(e)
     moveCursor (chart, e.target.innerHTML)
   })
 
   function initChart() {
     var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
     xAxis.dataFields.value = 'score';
-    xAxis.strictMinMax = true;
-    xAxis.min = -5;
-    xAxis.max = 105;
+    // xAxis.strictMinMax = true;
+    // xAxis.min = -5;
+    // xAxis.max = 105;
     xAxis.title.text = 'Score';
     xAxis.title.fontWeight = 600;
 
@@ -228,7 +235,7 @@ $(document).ready(function () {
     var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
     yAxis.dataFields.value = 'value';
     yAxis.min = 0;
-    yAxis.max = 0.02;
+    //yAxis.max = 0.02;
     yAxis.title.text = 'Normal Density';
     yAxis.title.fontWeight = 600;
 
@@ -458,12 +465,13 @@ function selectColor (label) {
   return color;
 }
 function insertArea (chart, am4core, gradeRange, radioValue, axis, series, from, to) {
+  console.log("insert area")
     var selectedColor = selectColor(radioValue)
     let colorRange = axis.createSeriesRange(series);
     colorRange.value = from;
     colorRange.endValue= to;
     colorRange.label.text=radioValue;
-    colorRange.contents.stroke = am4core.color(selectedColor);
+    //colorRange.contents.stroke = am4core.color(selectedColor);
     colorRange.contents.fill = am4core.color(selectedColor);
     colorRange.contents.fillOpacity = 0.5;
     gradeRange.push(colorRange);
@@ -518,7 +526,7 @@ function updateAreaRatio (gradeRange, scores) {
       }
     })
     var prob = count / scores.length
-    $('#gradeTable #'+gradeRange[i].label.text).html(prob);
+    $('#gradeTable #'+gradeRange[i].label.text).html(prob.toFixed(4));
   }
 }
 
@@ -527,11 +535,40 @@ function moveCursor (chart, sid) {
     if (chart.data[i].sid==sid){
       console.log("found "+sid)
       topFunction();
-      let point = chart.xAxes.getIndex(0).valueToPoint(parseFloat(chart.data[i].score));
+      let point = {
+        x: 0,
+        y: 0
+      }
+      let tmpX = chart.xAxes.getIndex(0).valueToPoint(parseFloat(chart.data[i].score));
+      let tmpY = chart.yAxes.getIndex(0).valueToPoint(parseFloat(chart.data[i].value));
+      point.x = tmpX.x;
+      point.y = tmpY.y;
       chart.cursor.triggerMove(point, "none");
       break;
     }
   }
+}
+
+function setGrade (chart, gradeRange) {
+  // update chart data
+  for (var index in gradeRange){
+    for (let i = 0; i < chart.data.length; i++) {
+      if(chart.data[i].score>=gradeRange[index].value&&chart.data[i].score<=gradeRange[index].endValue){
+        chart.data[i].grade = gradeRange[index].label.text;
+      }
+    }
+  }
+  // update table
+  let infoTable = [];
+  for (let i = 0; i < chart.data.length; i++) {
+    let infoTableElement = `<tr>
+      <th scope="row">${chart.data[i].sid}</th>
+      <td>${chart.data[i].score}</td>
+      <td>${chart.data[i].grade}</td>
+      </tr>`;
+    infoTable.push(infoTableElement);
+  }
+  $('#overallTable tbody').html(infoTable);
 }
 
 /* Sorting */

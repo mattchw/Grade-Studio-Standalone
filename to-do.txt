@@ -11,6 +11,8 @@ Critical-Low:
 - Step 1
     - Enable more types of csv file (auto detect the CSV data, only final scores? with sub-component?)
     - Send the analysis report to the student if the input is the email.
+- Step 2
+    - preset weighting for users in setting page
 - Step 3
     - Sub-component comparison, e.g. good at mid-term, poor at final
 
@@ -25,6 +27,7 @@ Non-critical-Low:
     - Hide student identity (for demo purpose, don't show the real identity)
     - Add more charts and statistics, e.g. Pie chart for the weighting
     - Sub-component analysis, like many students are poor in Assignment-2
+    - Customize grade
 
 Future Work:
 - future learning analysis
@@ -32,5 +35,9 @@ Future Work:
 
 I don't know where to put:
 - Also the meta data of the Grading work
-- preset weighting for users in setting page
+
 - Fix and Fuzzy boundary for the grading, e.g. +- 5% for Grade-A
+- 3: export csv (customize: add course code) sort sid
+- 3: disable exporting data
+- 1: allow user to type filename
+- 3: pie chart for weighting

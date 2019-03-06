@@ -119,8 +119,67 @@ $(document).ready(function () {
               //     jsonData[columnName] = column.value;
               // });
               // viewData.employees.push(jsonData);
+              var tabItems = []
+              $('#settingTable tbody tr').each(function (key, item) {
+                if($(item).find('input').val() != ''){
+                  tabItems.push($(item).find('th').html());
+                }
+              });
+
+              var tabNav = [];
+              var tabContent = [];
+
+              for (var i in tabItems) {
+                let tabNavElement = `<li class="nav-item">
+                  <a class="nav-link" id="${tabItems[i]}-tab" data-toggle="tab" href="#${tabItems[i]}" role="tab" aria-controls="${tabItems[i]}" aria-selected="true">${tabItems[i]}</a>
+                </li>`;
+                tabNav.push(tabNavElement);
+                let tabContentElement = `<div class="tab-pane fade" id="${tabItems[i]}" role="tabpanel" aria-labelledby="${tabItems[i]}-tab">
+                <table class="table" id="${tabItems[i]}-statsTable">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">Statistics</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Mean</th>
+                      <td id="mean">50</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Standard Deviation</th>
+                      <td id="std">20</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Max</th>
+                      <td id="max">max</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Min</th>
+                      <td id="min">min</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table class="table table-hover" id="${tabItems[i]}-overallTable">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">SID</th>
+                      <th scope="col">Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+                </div>`;
+                tabContent.push(tabContentElement);
+              }
+              $('#myTab').prepend(tabNav);
+              $('#myTabContent').prepend(tabContent);
 
 
+
+              $('#outputDiv').css('display', 'block')
               $('#chartDiv').css('display', 'block')
               $('#gradeOption').css('display', 'block')
               $('#infoTableDiv').css('display', 'block')
@@ -143,22 +202,22 @@ $(document).ready(function () {
 
               // mean = calculateMeanScore(scores);
               mean = calculateMeanScore(scores);
-              $('#mean').html(mean.toFixed(4));
+              $('#overall-statsTable #mean').html(mean.toFixed(2));
               console.log('mean: ' + mean);
 
               // stdDev = standardDeviation(scores);
               stdDev = standardDeviation(scores);
-              $('#std').html(stdDev.toFixed(4));
+              $('#overall-statsTable #std').html(stdDev.toFixed(2));
               console.log('stdDev: ' + stdDev);
 
               // max = Math.max.apply(null, scores);
               max = Math.max.apply(null, scores);
-              $('#max').html(max);
+              $('#overall-statsTable #max').html(max);
               console.log('max: ' + max);
 
               // min = Math.min.apply(null, scores);
               min = Math.min.apply(null, scores);
-              $('#min').html(min);
+              $('#overall-statsTable #min').html(min);
               console.log('min: ' + min);
 
               // for (let i = 0; i < res.length; i++) {
@@ -526,7 +585,7 @@ function updateAreaRatio (gradeRange, scores) {
       }
     })
     var prob = count / scores.length
-    $('#gradeTable #'+gradeRange[i].label.text).html(prob.toFixed(4));
+    $('#gradeTable #'+gradeRange[i].label.text).html(prob.toFixed(2));
   }
 }
 

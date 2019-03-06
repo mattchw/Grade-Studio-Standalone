@@ -41,3 +41,8 @@ html, body {
   padding: 15px;
   border-radius: 4px;
 }
+
+#dlSampleFileBtn {
+  border: 0;
+  background-color: transparent;
+}

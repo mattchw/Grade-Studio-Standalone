@@ -394,6 +394,10 @@ $(document).ready(function () {
 
 })
 
+function alertRefresh () {
+  return 0;
+}
+
 window.onscroll = function () {
   scrollFunction()
 };

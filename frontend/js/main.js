@@ -306,7 +306,7 @@ $(document).ready(function () {
                 data.push(new_data);
                 let infoTableElement = `<tr>
                   <th scope="row">${outputData[i].sid}</th>
-                  <td>${outputData[i].score.toFixed(4)}</td>
+                  <td>${outputData[i].score.toFixed(2)}</td>
                   <td></td>
                 </tr>`;
                 infoTable.push(infoTableElement);

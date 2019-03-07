@@ -15,16 +15,21 @@ html, body {
   display: none;
 }
 
-#chartDiv {
+#chartContainer {
   height: 65%;
   display: none;
+}
+
+#chartDiv {
+  /* height: 65%; */
+  /* display: none; */
   border: solid;
   margin: 5px;
 }
 
 #weightingChartDiv {
   /* height: 65%; */
-  display: none;
+  /* display: none; */
   border: solid;
   margin: 5px;
 }

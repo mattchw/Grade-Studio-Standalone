@@ -73,7 +73,25 @@
       </div>
     </div>
 
-    <div id="chartDiv"></div>
+    <ul class="nav nav-tabs" id="chartTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="overallChart-tab" data-toggle="tab" href="#overallChart-tabContent" role="tab" aria-controls="overallChart" aria-selected="true">Overall Chart</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" id="weightingChart-tab" data-toggle="tab" href="#weightingChart-tabContent" role="tab" aria-controls="weightingChart" aria-selected="true">Weighting Chart</a>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="chartTabContent">
+      <div class="tab-pane fade show active" id="overallChart-tabContent" role="tabpanel" aria-labelledby="overall-tab">
+        <div id="chartDiv"></div>
+      </div>
+
+      <div class="tab-pane fade" id="weightingChart-tabContent" role="tabpanel" aria-labelledby="overall-tab">
+        <div id="weightingChartDiv"></div>
+      </div>
+    </div>
 
     <div id="outputDiv">
       <div id="gradeOption">

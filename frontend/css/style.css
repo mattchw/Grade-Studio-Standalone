@@ -16,7 +16,14 @@ html, body {
 }
 
 #chartDiv {
-  height: 65%;
+  /* height: 65%; */
+  display: none;
+  border: solid;
+  margin: 5px;
+}
+
+#weightingChartDiv {
+  /* height: 65%; */
   display: none;
   border: solid;
   margin: 5px;

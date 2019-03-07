@@ -177,12 +177,50 @@ $(document).ready(function () {
               $('#myTab').prepend(tabNav);
               $('#myTabContent').prepend(tabContent);
 
+              //init table
+              for (var i in tabItems) {
+                console.log("tabItems: "+tabItems[i])
+                let infoTable = []
+                let scores = [];
 
+                let mean = -1;
+                let stdDev = -1;
+                let max = -1;
+                let min = -1;
+
+                res.forEach(function (student, index) {
+                  console.log(student["sid"])
+                  console.log(student[tabItems[i]]);
+                  let infoTableElement = `<tr>
+                    <th scope="row">${student["sid"]}</th>
+                    <td>${student[tabItems[i]]}</td>
+                  </tr>`;
+                  scores.push(parseFloat(student[tabItems[i]]));
+                  infoTable.push(infoTableElement);
+                });
+
+                mean = calculateMeanScore(scores);
+                $('#'+tabItems[i]+'-statsTable #mean').html(mean.toFixed(2));
+
+                // stdDev = standardDeviation(scores);
+                stdDev = standardDeviation(scores);
+                $('#'+tabItems[i]+'-statsTable #std').html(stdDev.toFixed(2));
+
+                // max = Math.max.apply(null, scores);
+                max = Math.max.apply(null, scores);
+                $('#'+tabItems[i]+'-statsTable #max').html(max);
+
+                // min = Math.min.apply(null, scores);
+                min = Math.min.apply(null, scores);
+                $('#'+tabItems[i]+'-statsTable #min').html(min);
+
+                $('#'+tabItems[i]+'-overallTable tbody').html(infoTable);
+              }
 
               $('#outputDiv').css('display', 'block')
               $('#chartDiv').css('display', 'block')
               $('#gradeOption').css('display', 'block')
-              $('#infoTableDiv').css('display', 'block')
+              //$('#infoTableDiv').css('display', 'block')
               $('#fileSubmitDiv').css('display', 'none')
               // console.log(res);
 
@@ -243,12 +281,12 @@ $(document).ready(function () {
                 data.push(new_data);
                 let infoTableElement = `<tr>
                   <th scope="row">${outputData[i].sid}</th>
-                  <td>${outputData[i].score}</td>
+                  <td>${outputData[i].score.toFixed(4)}</td>
                   <td></td>
                 </tr>`;
                 infoTable.push(infoTableElement);
               }
-              $('#overallTable tbody').html(infoTable);
+              $('#overall-overallTable tbody').html(infoTable);
               console.log(data);
               chart.data = data;
 
@@ -622,12 +660,12 @@ function setGrade (chart, gradeRange) {
   for (let i = 0; i < chart.data.length; i++) {
     let infoTableElement = `<tr>
       <th scope="row">${chart.data[i].sid}</th>
-      <td>${chart.data[i].score}</td>
+      <td>${chart.data[i].score.toFixed(4)}</td>
       <td>${chart.data[i].grade}</td>
       </tr>`;
     infoTable.push(infoTableElement);
   }
-  $('#overallTable tbody').html(infoTable);
+  $('#overall-overallTable tbody').html(infoTable);
 }
 
 /* Sorting */

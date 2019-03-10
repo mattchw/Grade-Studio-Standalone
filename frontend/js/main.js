@@ -1,28 +1,7 @@
 $(document).ready(function () {
   am4core.useTheme(am4themes_animated);
   var chart = am4core.create('chartDiv', am4charts.XYChart);
-  var chart2 = am4core.create('weightingChartDiv', am4charts.PieChart);
-
-  chart2.data = [{
-    "component": "asg1",
-    "weighting": 10
-  }, {
-    "component": "asg2",
-    "weighting": 10
-  }, {
-    "component": "asg3",
-    "weighting": 10
-  }, {
-    "component": "project",
-    "weighting": 20
-  }, {
-    "component": "final",
-    "weighting": 50
-  }];
-
-  var pieSeries = chart2.series.push(new am4charts.PieSeries());
-  pieSeries.dataFields.value = "weighting";
-  pieSeries.dataFields.category = "component";
+  var weightingChart = am4core.create('weightingChartDiv', am4charts.PieChart);
 
   var scores = [];
   var gradeRange = [];
@@ -241,7 +220,8 @@ $(document).ready(function () {
               }
 
               $('#outputDiv').css('display', 'block')
-              $('#chartContainer').css('display', 'block')
+              $('#chartOption').css('display', 'block')
+              $('#chartDiv').css('display', 'block')
               // $('#chartDiv').css('display', 'block')
               // $('#weightingChartDiv').css('display', 'block')
               $('#gradeOption').css('display', 'block')
@@ -275,12 +255,12 @@ $(document).ready(function () {
 
               // max = Math.max.apply(null, scores);
               max = Math.max.apply(null, scores);
-              $('#overall-statsTable #max').html(max);
+              $('#overall-statsTable #max').html(max.toFixed(2));
               console.log('max: ' + max);
 
               // min = Math.min.apply(null, scores);
               min = Math.min.apply(null, scores);
-              $('#overall-statsTable #min').html(min);
+              $('#overall-statsTable #min').html(min.toFixed(2));
               console.log('min: ' + min);
 
               // for (let i = 0; i < res.length; i++) {
@@ -315,9 +295,31 @@ $(document).ready(function () {
               console.log(data);
               chart.data = data;
 
+              let tmpData = [];
+              for (let i = 0; i < inputWeighting.length; i++) {
+                var new_data = {};
+                if (inputWeighting[i]>0){
+                  new_data.component = inputFields[i];
+                  new_data.weighting = inputWeighting[i];
+                  tmpData.push(new_data);
+                }
+              }
+              weightingChart.data = tmpData
+
               initChart();
+              initWeightingChart();
             }
           });
+  })
+
+  $('#showOverallChartBtn').click(function () {
+    $('#chartDiv').css('display', 'block')
+    $('#weightingChartDiv').css('display', 'none')
+  })
+
+  $('#showWeightingChartBtn').click(function () {
+    $('#weightingChartDiv').css('display', 'block')
+    $('#chartDiv').css('display', 'none')
   })
 
   $('#gradeClearBtn').click(function () {
@@ -512,6 +514,28 @@ $(document).ready(function () {
     chart.exporting.menu = new am4core.ExportMenu();
   }
 
+  function initWeightingChart() {
+    // weightingChart.data = [{
+    //   "component": "asg1",
+    //   "weighting": 10
+    // }, {
+    //   "component": "asg2",
+    //   "weighting": 10
+    // }, {
+    //   "component": "asg3",
+    //   "weighting": 10
+    // }, {
+    //   "component": "project",
+    //   "weighting": 20
+    // }, {
+    //   "component": "final",
+    //   "weighting": 50
+    // }];
+
+    var pieSeries = weightingChart.series.push(new am4charts.PieSeries());
+    pieSeries.dataFields.value = "weighting";
+    pieSeries.dataFields.category = "component";
+  }
 
 
 })

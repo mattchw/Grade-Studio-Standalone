@@ -27,7 +27,14 @@ Non-critical-Low:
     - Hide student identity (for demo purpose, don't show the real identity)
     - Add more charts and statistics, e.g. Pie chart for the weighting
     - Sub-component analysis, like many students are poor in Assignment-2
-    - Customize grade
+    - Customize grade (better with remarks)
+    - Invitation for action (see student’s position on the chart)
+    - Stat need: number of count 63/70 (population size), median
+    - Two columns in the stat table
+    - Flip the F D C B A —> A B C D F
+    - Calculate the population of different grades rather than only percentage
+    - Put a disclaimer and welcome feedback
+    - Change the constraint of weighting not equal to 100%
 
 Future Work:
 - future learning analysis
@@ -41,3 +48,9 @@ I don't know where to put:
 - 3: disable exporting data
 - 1: allow user to type filename
 - 3: pie chart for weighting
+
+- ***Automatically giving grade to the chart area
+- Chart: frequency chart (best bin size) (histogram)
+- ***Best bin size to show the normal distribution and has least error
+- ***quatile will be shown if the graph can be done
+- Export function: graph, grades, stats

@@ -26,6 +26,13 @@ html, body {
   margin: 5px;
 }
 
+#histDiv {
+  height: 65%;
+  display: none;
+  border: solid;
+  margin: 5px;
+}
+
 #weightingChartDiv {
   height: 65%;
   display: none;

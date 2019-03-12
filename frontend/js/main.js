@@ -1,6 +1,7 @@
 $(document).ready(function () {
   am4core.useTheme(am4themes_animated);
   var chart = am4core.create('chartDiv', am4charts.XYChart);
+  var histChart = am4core.create('histDiv', am4charts.XYChart);
   var weightingChart = am4core.create('weightingChartDiv', am4charts.PieChart);
 
   var scores = [];
@@ -306,20 +307,67 @@ $(document).ready(function () {
               }
               weightingChart.data = tmpData
 
+              let histMax = Math.ceil(max/5)*5;
+              let histMin = Math.floor(min/5)*5;
+              console.log("max: "+histMax+" min: "+histMin);
+              let binNum = 10;
+              let binSize = (histMax - histMin)/binNum;
+              console.log("bin size: "+binSize)
+
+              let histData = [];
+              for (let i = 0; i < binNum; i++){
+                var new_data = {};
+                new_data.country = (histMin+(i*binSize)).toString()
+                new_data.visits = 0;
+                histData.push(new_data);
+              }
+
+              for (let i = 0; i < outputData.length; i++) {
+                for (let j = 0; j < binNum; j++){
+                  let minBoundary = parseFloat(histData[j].country)
+                  if (j!=binNum-1) {
+                    let maxBoundary = parseFloat(histData[j+1].country)
+                    if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
+                      histData[j].visits = histData[j].visits+1;
+                      break;
+                    }
+                  } else {
+                    if (outputData[i].score>=minBoundary) {
+                      histData[j].visits = histData[j].visits+1;
+                      break;
+                    }
+                  }
+                }
+              }
+              //histData.pop();
+              histChart.data = histData
+
               initChart();
               initWeightingChart();
+              initHistChart();
             }
           });
   })
 
   $('#showOverallChartBtn').click(function () {
     $('#chartDiv').css('display', 'block')
+    $('#gradeOption').css('display', 'block')
+    $('#histDiv').css('display', 'none')
+    $('#weightingChartDiv').css('display', 'none')
+  })
+
+  $('#showOverallHistBtn').click(function () {
+    $('#histDiv').css('display', 'block')
+    $('#chartDiv').css('display', 'none')
+    $('#gradeOption').css('display', 'none')
     $('#weightingChartDiv').css('display', 'none')
   })
 
   $('#showWeightingChartBtn').click(function () {
     $('#weightingChartDiv').css('display', 'block')
     $('#chartDiv').css('display', 'none')
+    $('#gradeOption').css('display', 'none')
+    $('#histDiv').css('display', 'none')
   })
 
   $('#gradeClearBtn').click(function () {
@@ -488,12 +536,12 @@ $(document).ready(function () {
       } else {
         if (newInsert>-1&&overlap>-1) {
           // update existing area
-          updateTwoAreas (gradeRange, radioValue, newInsert, overlap, from, to)
+          updateTwoAreas (chart, gradeRange, radioValue, newInsert, overlap, from, to)
         } else if (newInsert==-1&&overlap>-1) {
           // insert new area but update affected area
           insertArea(chart, am4core, gradeRange, radioValue, axis, series, from, to)
           //update area
-          updateArea (gradeRange, overlap, from, to)
+          updateArea (chart, gradeRange, overlap, from, to)
         } else if (newInsert==-1&&overlap==-1) {
           // insert new area and do nothing
           insertArea(chart, am4core, gradeRange, radioValue, axis, series, from, to)
@@ -537,6 +585,67 @@ $(document).ready(function () {
     pieSeries.dataFields.category = "component";
   }
 
+  function initHistChart() {
+    // Add data
+    // histChart.data = [{
+    //   "country": "USA",
+    //   "visits": 2025
+    // }, {
+    //   "country": "China",
+    //   "visits": 1882
+    // }, {
+    //   "country": "Japan",
+    //   "visits": 1809
+    // }, {
+    //   "country": "Germany",
+    //   "visits": 1322
+    // }, {
+    //   "country": "UK",
+    //   "visits": 1122
+    // }, {
+    //   "country": "France",
+    //   "visits": 1114
+    // }, {
+    //   "country": "India",
+    //   "visits": 984
+    // }, {
+    //   "country": "Spain",
+    //   "visits": 711
+    // }, {
+    //   "country": "Netherlands",
+    //   "visits": 665
+    // }, {
+    //   "country": "Russia",
+    //   "visits": 580
+    // }];
+
+    // Create axes
+    var categoryAxis = histChart.xAxes.push(new am4charts.CategoryAxis());
+    categoryAxis.dataFields.category = "country";
+    categoryAxis.renderer.grid.template.location = 0;
+    categoryAxis.renderer.minGridDistance = 30;
+
+    categoryAxis.renderer.labels.template.adapter.add("dy", function(dy, target) {
+      if (target.dataItem && target.dataItem.index & 2 == 2) {
+        return dy + 25;
+      }
+      return dy;
+    });
+
+    var valueAxis = histChart.yAxes.push(new am4charts.ValueAxis());
+
+    // Create series
+    var series = histChart.series.push(new am4charts.ColumnSeries());
+    series.dataFields.valueY = "visits";
+    series.dataFields.categoryX = "country";
+    series.name = "Visits";
+    series.columns.template.tooltipText = "{categoryX}: [bold]{valueY}[/]";
+    series.columns.template.fillOpacity = .8;
+
+    var columnTemplate = series.columns.template;
+    columnTemplate.strokeWidth = 2;
+    columnTemplate.strokeOpacity = 1;
+  }
 
 })
 
@@ -630,20 +739,21 @@ function insertArea (chart, am4core, gradeRange, radioValue, axis, series, from,
     colorRange.value = from;
     colorRange.endValue= to;
     colorRange.label.text=radioValue;
-    //colorRange.contents.stroke = am4core.color(selectedColor);
+    colorRange.contents.stroke = am4core.color(selectedColor);
     colorRange.contents.fill = am4core.color(selectedColor);
     colorRange.contents.fillOpacity = 0.5;
     gradeRange.push(colorRange);
     chart.validateData();
 }
-function updateArea (gradeRange, overlap, from, to) {
+function updateArea (chart, gradeRange, overlap, from, to) {
   if(from>=gradeRange[overlap].value&&from<=gradeRange[overlap].endValue){
     gradeRange[overlap].endValue = from
   } else if (to>=gradeRange[overlap].value&&to<=gradeRange[overlap].endValue) {
     gradeRange[overlap].value = to
   }
+  chart.validateData();
 }
-function updateTwoAreas (gradeRange, radioValue, newInsert, overlap, from, to) {
+function updateTwoAreas (chart, gradeRange, radioValue, newInsert, overlap, from, to) {
   if (newInsert==overlap) {
     if((from>=gradeRange[overlap].value&&from<=gradeRange[overlap].endValue)){
       gradeRange[overlap].endValue = to;
@@ -675,6 +785,7 @@ function updateTwoAreas (gradeRange, radioValue, newInsert, overlap, from, to) {
       gradeRange[overlap].value = to
     }
   }
+  chart.validateData();
 }
 function updateAreaRatio (gradeRange, scores) {
   for (var i in gradeRange) {
@@ -684,8 +795,8 @@ function updateAreaRatio (gradeRange, scores) {
         count++;
       }
     })
-    var prob = count / scores.length
-    $('#gradeTable #'+gradeRange[i].label.text).html(prob.toFixed(2));
+    var num = count
+    $('#gradeTable #'+gradeRange[i].label.text).html(num);
   }
 }
 

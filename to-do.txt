@@ -56,3 +56,8 @@ I don't know where to put:
 - ***Best bin size to show the normal distribution and has least error
 - ***quatile will be shown if the graph can be done
 - Export function: graph, grades, stats
+- unit testing for scores
+- adjust bin size/ bin num
+
+chart comparison:
+- same students/different students, intra/inter

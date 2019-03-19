@@ -89,7 +89,7 @@ $(document).ready(function () {
             } else if (tableWeighting !== 100) {
               alert('Toal weighting not equal to 100%. Please check again.');
             } else {
-              // calculate weighted score
+              /* calculate weighted score */
               var inputWeighting = getWeighting();
               var inputFields = getCsvFields();
               var outputData = [];
@@ -107,10 +107,9 @@ $(document).ready(function () {
                   }
                 }
                 studentObj['score'] = tmpScore;
-                // outputData.push(tmpScore);
                 outputData.push(studentObj);
               });
-              // end of calculating weighted score
+              /* end of calculating weighted score */
 
               // var chartData = new Object();
               // var jsonData = {};
@@ -190,6 +189,7 @@ $(document).ready(function () {
                 let stdDev = -1;
                 let max = -1;
                 let min = -1;
+                let median = -1;
 
                 res.forEach(function (student, index) {
                   console.log(student["sid"])
@@ -204,6 +204,9 @@ $(document).ready(function () {
 
                 mean = calculateMeanScore(scores);
                 $('#'+tabItems[i]+'-statsTable #mean').html(mean.toFixed(2));
+
+                median = calculateMedian(scores);
+                $('#'+tabItems[i]+'-statsTable #median').html(median.toFixed(2));
 
                 // stdDev = standardDeviation(scores);
                 stdDev = standardDeviation(scores);
@@ -705,6 +708,18 @@ function standardDeviation (scores) {
 function NormalDensityZx (x, Mean, StdDev) {
   var a = x - Mean;
   return Math.exp( -( a * a ) / ( 2 * StdDev * StdDev ) ) / ( Math.sqrt( 2 * Math.PI ) * StdDev );
+}
+function calculateMedian (scores) {
+	scores.sort(function (a, b) {
+  	return a - b;
+  });
+
+  var half = Math.floor(scores.length / 2);
+
+  if (scores.length % 2)
+  	return scores[half];
+  else
+  	return (scores[half - 1] + scores[half]) / 2.0;
 }
 
 /* Chart Function */

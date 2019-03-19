@@ -205,9 +205,6 @@ $(document).ready(function () {
                 mean = calculateMeanScore(scores);
                 $('#'+tabItems[i]+'-statsTable #mean').html(mean.toFixed(2));
 
-                median = calculateMedian(scores);
-                $('#'+tabItems[i]+'-statsTable #median').html(median.toFixed(2));
-
                 // stdDev = standardDeviation(scores);
                 stdDev = standardDeviation(scores);
                 $('#'+tabItems[i]+'-statsTable #std').html(stdDev.toFixed(2));
@@ -251,6 +248,9 @@ $(document).ready(function () {
               mean = calculateMeanScore(scores);
               $('#overall-statsTable #mean').html(mean.toFixed(2));
               console.log('mean: ' + mean);
+
+              median = calculateMedian(scores);
+              $('#overall-statsTable #median').html(median.toFixed(2));
 
               // stdDev = standardDeviation(scores);
               stdDev = standardDeviation(scores);

@@ -40,6 +40,10 @@ html, body {
   margin: 5px;
 }
 
+#changeSettingDiv {
+  display: none;
+}
+
 #gradeOption {
   display: none;
 }

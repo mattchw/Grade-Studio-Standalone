@@ -316,6 +316,7 @@ $(document).ready(function () {
               }
               $('#overall-overallTable tbody').html(infoTable);
               console.log(data);
+              /* overall table data */
               chart.data = data;
 
               let tmpData = [];
@@ -327,7 +328,22 @@ $(document).ready(function () {
                   tmpData.push(new_data);
                 }
               }
+              /* weighting table data */
               weightingChart.data = tmpData
+
+              var changeSettingEl = []
+              for (let i in tmpData) {
+                console.log(tmpData[i])
+                let changeSettingTableRow = `<tr>
+                  <th scope="row">${tmpData[i].component}</th>
+                  <td>
+                    <input class="form-control" id="changeWeighting-${i}" value="${tmpData[i].weighting * 100}" type="number" min="1" max="100">
+                  </td>
+                </tr>`
+                changeSettingEl.push(changeSettingTableRow)
+              }
+              $('#changeSettingTable tbody').html(changeSettingEl);
+
 
               let histMax = Math.ceil(max/5)*5;
               let histMin = Math.floor(min/5)*5;
@@ -382,6 +398,7 @@ $(document).ready(function () {
     $('#histDiv').css('display', 'none')
     $('#binOption').css('display', 'none')
     $('#weightingChartDiv').css('display', 'none')
+    $('#changeSettingDiv').css('display', 'none')
   })
 
   $('#showOverallHistBtn').click(function () {
@@ -390,10 +407,12 @@ $(document).ready(function () {
     $('#chartDiv').css('display', 'none')
     $('#gradeOption').css('display', 'none')
     $('#weightingChartDiv').css('display', 'none')
+    $('#changeSettingDiv').css('display', 'none')
   })
 
   $('#showWeightingChartBtn').click(function () {
     $('#weightingChartDiv').css('display', 'block')
+    $('#changeSettingDiv').css('display', 'block')
     $('#chartDiv').css('display', 'none')
     $('#gradeOption').css('display', 'none')
     $('#histDiv').css('display', 'none')

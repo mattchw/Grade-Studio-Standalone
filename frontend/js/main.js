@@ -11,6 +11,9 @@ $(document).ready(function () {
   var stdDev = -1;
   var max = -1;
   var min = -1;
+  var median = -1;
+  var upperQ = -1;
+  var lowerQ = -1;
 
   var unselectedScore = [];
 
@@ -162,6 +165,10 @@ $(document).ready(function () {
                       <th scope="row">Min</th>
                       <td id="min">min</td>
                     </tr>
+                    <tr>
+                      <th scope="row">Median</th>
+                      <td id="median">median</td>
+                    </tr>
                   </tbody>
                 </table>
                 <table class="table table-hover" id="${tabItems[i]}-overallTable">
@@ -190,6 +197,7 @@ $(document).ready(function () {
                 let stdDev = -1;
                 let max = -1;
                 let min = -1;
+                let median = -1;
 
                 res.forEach(function (student, index) {
                   console.log(student["sid"])
@@ -216,6 +224,9 @@ $(document).ready(function () {
                 // min = Math.min.apply(null, scores);
                 min = Math.min.apply(null, scores);
                 $('#'+tabItems[i]+'-statsTable #min').html(min);
+
+                median = calculateMedian(scores);
+                $('#'+tabItems[i]+'-statsTable #median').html(median);
 
                 $('#'+tabItems[i]+'-overallTable tbody').html(infoTable);
               }
@@ -244,6 +255,8 @@ $(document).ready(function () {
                 unselectedScore.push(Number(outputData[i].score));
               }
 
+              $('#overall-statsTable #count').html(scores.length);
+
               // mean = calculateMeanScore(scores);
               mean = calculateMeanScore(scores);
               $('#overall-statsTable #mean').html(mean.toFixed(2));
@@ -264,6 +277,16 @@ $(document).ready(function () {
               $('#overall-statsTable #min').html(min.toFixed(2));
               console.log('min: ' + min);
 
+              median = calculateMedian(scores);
+              $('#overall-statsTable #median').html(median.toFixed(2));
+
+              upperQ = Quartile_75(scores);
+              $('#overall-statsTable #upperQ').html(upperQ.toFixed(2));
+              console.log("Upper Quartile: "+upperQ);
+
+              lowerQ = Quartile_25(scores);
+              $('#overall-statsTable #lowerQ').html(lowerQ.toFixed(2));
+              console.log("Lower Quartile: "+lowerQ);
               // for (let i = 0; i < res.length; i++) {
               //   var new_data = {};
               //   new_data.sid = res[i].sid;
@@ -701,6 +724,63 @@ function standardDeviation (scores) {
   var avgSquareDiff = calculateMeanScore(squareDiffs);
   var stdDev = Math.sqrt(avgSquareDiff);
   return stdDev;
+}
+function calculateMedian(scores) {
+    // median of [3, 5, 4, 4, 1, 1, 2, 3] = 3
+    var median = 0, numsLen = scores.length;
+    scores.sort();
+
+    if (
+        numsLen % 2 === 0 // is even
+    ) {
+        // average of two middle numbers
+        median = (scores[numsLen / 2 - 1] + scores[numsLen / 2]) / 2;
+    } else { // is odd
+        // middle number only
+        median = scores[(numsLen - 1) / 2];
+    }
+
+    return median;
+}
+function calculateMode(numbers) {
+    // as result can be bimodal or multi-modal,
+    // the returned result is provided as an array
+    // mode of [3, 5, 4, 4, 1, 1, 2, 3] = [1, 3, 4]
+    var modes = [], count = [], i, number, maxIndex = 0;
+
+    for (i = 0; i < numbers.length; i += 1) {
+        number = numbers[i];
+        count[number] = (count[number] || 0) + 1;
+        if (count[number] > maxIndex) {
+            maxIndex = count[number];
+        }
+    }
+
+    for (i in count)
+        if (count.hasOwnProperty(i)) {
+            if (count[i] === maxIndex) {
+                modes.push(Number(i));
+            }
+        }
+
+    return modes;
+}
+function Quartile_25(data) {
+  return Quartile(data, 0.25);
+}
+function Quartile_75(data) {
+  return Quartile(data, 0.75);
+}
+function Quartile(scores, q) {
+  var data = scores.sort();
+  var pos = ((data.length) - 1) * q;
+  var base = Math.floor(pos);
+  var rest = pos - base;
+  if( (data[base+1]!==undefined) ) {
+    return data[base] + rest * (data[base+1] - data[base]);
+  } else {
+    return data[base];
+  }
 }
 function NormalDensityZx (x, Mean, StdDev) {
   var a = x - Mean;

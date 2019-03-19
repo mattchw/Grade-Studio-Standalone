@@ -924,6 +924,10 @@ function moveCursor (chart, sid) {
 }
 
 function setGrade (chart, gradeRange) {
+  // reset chart data first
+  for (let i = 0; i < chart.data.length; i++) {
+      chart.data[i].grade = '';
+  }
   // update chart data
   for (var index in gradeRange){
     for (let i = 0; i < chart.data.length; i++) {

@@ -92,28 +92,14 @@ $(document).ready(function () {
             } else if (tableWeighting !== 100) {
               alert('Toal weighting not equal to 100%. Please check again.');
             } else {
-              // calculate weighted score
+              /* calculate weighted score */
               var inputWeighting = getWeighting();
               var inputFields = getCsvFields();
               var outputData = [];
               console.log(inputWeighting);
               console.log(inputFields);
-
-              res.forEach(function (student, index) {
-                let tmpScore = 0;
-                let studentObj = {};
-                for (let i = 0; i < inputFields.length; i++) {
-                  if (inputWeighting[i] === 0) {
-                    studentObj[inputFields[i]] = student[inputFields[i]];
-                  } else {
-                    tmpScore += inputWeighting[i] * student[inputFields[i]];
-                  }
-                }
-                studentObj['score'] = tmpScore;
-                // outputData.push(tmpScore);
-                outputData.push(studentObj);
-              });
-              // end of calculating weighted score
+              outputData = calculateWeightedScore(res, inputWeighting, inputFields);
+              /* end of calculating weighted score */
 
               // var chartData = new Object();
               // var jsonData = {};
@@ -152,6 +138,10 @@ $(document).ready(function () {
                     <tr>
                       <th scope="row">Mean</th>
                       <td id="mean">50</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Median</th>
+                      <td id="median">50</td>
                     </tr>
                     <tr>
                       <th scope="row">Standard Deviation</th>
@@ -213,6 +203,9 @@ $(document).ready(function () {
                 mean = calculateMeanScore(scores);
                 $('#'+tabItems[i]+'-statsTable #mean').html(mean.toFixed(2));
 
+                median = calculateMedian(scores);
+                $('#'+tabItems[i]+'-statsTable #median').html(median.toFixed(2));
+
                 // stdDev = standardDeviation(scores);
                 stdDev = standardDeviation(scores);
                 $('#'+tabItems[i]+'-statsTable #std').html(stdDev.toFixed(2));
@@ -261,6 +254,9 @@ $(document).ready(function () {
               mean = calculateMeanScore(scores);
               $('#overall-statsTable #mean').html(mean.toFixed(2));
               console.log('mean: ' + mean);
+
+              median = calculateMedian(scores);
+              $('#overall-statsTable #median').html(median.toFixed(2));
 
               // stdDev = standardDeviation(scores);
               stdDev = standardDeviation(scores);
@@ -689,6 +685,7 @@ window.onscroll = function () {
   scrollFunction()
 };
 
+/* Scroll to the top of the page */
 function scrollFunction () {
   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
     $('#backToTopBtn').css('display', 'block')
@@ -696,8 +693,6 @@ function scrollFunction () {
     $('#backToTopBtn').css('display', 'none')
   }
 }
-
-// When the user clicks on the button, scroll to the top of the document
 function topFunction () {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
@@ -785,6 +780,35 @@ function Quartile(scores, q) {
 function NormalDensityZx (x, Mean, StdDev) {
   var a = x - Mean;
   return Math.exp( -( a * a ) / ( 2 * StdDev * StdDev ) ) / ( Math.sqrt( 2 * Math.PI ) * StdDev );
+}
+function calculateMedian (scores) {
+	scores.sort(function (a, b) {
+  	return a - b;
+  });
+
+  var half = Math.floor(scores.length / 2);
+
+  if (scores.length % 2)
+  	return scores[half];
+  else
+  	return (scores[half - 1] + scores[half]) / 2.0;
+}
+function calculateWeightedScore (inputdata, inputWeighting, inputFields) {
+  var output = []
+  inputdata.forEach(function (student, index) {
+    let tmpScore = 0;
+    let studentObj = {};
+    for (let i = 0; i < inputFields.length; i++) {
+      if (inputWeighting[i] === 0) {
+        studentObj[inputFields[i]] = student[inputFields[i]];
+      } else {
+        tmpScore += inputWeighting[i] * student[inputFields[i]];
+      }
+    }
+    studentObj['score'] = tmpScore;
+    output.push(studentObj);
+  });
+  return output;
 }
 
 /* Chart Function */
@@ -939,6 +963,7 @@ function selectionSort (arr) {
   return arr;
 }
 
+/* handle select form option onchange */
 function selectOnchange(elmt) {
   console.log(elmt);
   if ($(elmt).val() === 'sid' || $(elmt).val() === 'ignore') {
@@ -1003,6 +1028,7 @@ function suggestSetting() {
   });
 }
 
+/* get weighting from setting table */
 function getWeighting () {
   var weighting = [];
   $('#settingTable tbody tr').each(function (key, item) {

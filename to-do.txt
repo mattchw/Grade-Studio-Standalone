@@ -10,17 +10,25 @@ Critical-Low:
     - preset weighting for users in setting page
 - Step 3
     - Sub-component comparison, e.g. good at mid-term, poor at final
+    - Export csv (customize: add course code) sort sid
+    - Automatically giving grade to the chart area
+    - Add histogram with best bin size/manually adjust bin size
 
 Non-critical-Urgent:
 - Step 1
     - Basic checking on csv file
 - Step 3
-    - save the state for next time
+    - Save the state for next time
+    - Export file contains: graphs, grades, stats
 
 Non-critical-Low:
+- Step 1
+    - Allow user to type filename
+    - Fix and Fuzzy boundary for the grading, e.g. +- 5% for Grade-A
 - Step 3
+    - Disable exporting data
     - Hide student identity (for demo purpose, don't show the real identity)
-    - Add more charts and statistics, e.g. Pie chart for the weighting
+    - Add more charts and statistics, e.g. Pie chart for the weighting (pie chart done)
     - Sub-component analysis, like many students are poor in Assignment-2
     - Customize grade (better with remarks)
     - Invitation for action (see student’s position on the chart)
@@ -44,20 +52,8 @@ Future Work:
 
 I don't know where to put:
 - Also the meta data of the Grading work
-
-- Fix and Fuzzy boundary for the grading, e.g. +- 5% for Grade-A
-- 3: export csv (customize: add course code) sort sid
-- 3: disable exporting data
-- 1: allow user to type filename
-- 3: pie chart for weighting
-
-- ***Automatically giving grade to the chart area
-- Chart: frequency chart (best bin size) (histogram)
-- ***Best bin size to show the normal distribution and has least error
 - ***quatile will be shown if the graph can be done
-- Export function: graph, grades, stats
 - unit testing for scores
-- adjust bin size/ bin num
 
 chart comparison:
 - same students/different students, intra/inter

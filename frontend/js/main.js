@@ -937,7 +937,7 @@ function setGrade (chart, gradeRange) {
   for (let i = 0; i < chart.data.length; i++) {
     let infoTableElement = `<tr>
       <th scope="row">${chart.data[i].sid}</th>
-      <td>${chart.data[i].score.toFixed(4)}</td>
+      <td>${chart.data[i].score.toFixed(2)}</td>
       <td>${chart.data[i].grade}</td>
       </tr>`;
     infoTable.push(infoTableElement);

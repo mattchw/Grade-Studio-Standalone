@@ -6,6 +6,7 @@ $(document).ready(function () {
 
   var scores = [];
   var gradeRange = [];
+  var outputData = [];
 
   var mean = -1;
   var stdDev = -1;
@@ -16,6 +17,8 @@ $(document).ready(function () {
   var lowerQ = -1;
 
   var unselectedScore = [];
+
+  $('#binSize').text($('#binSlider').val());
 
   $('#uploadBtn').click(function () {
     var form = $('form')[0]; // You need to use standard javascript object here
@@ -95,7 +98,6 @@ $(document).ready(function () {
               /* calculate weighted score */
               var inputWeighting = getWeighting();
               var inputFields = getCsvFields();
-              var outputData = [];
               console.log(inputWeighting);
               console.log(inputFields);
               outputData = calculateWeightedScore(res, inputWeighting, inputFields);
@@ -230,6 +232,7 @@ $(document).ready(function () {
               // $('#chartDiv').css('display', 'block')
               // $('#weightingChartDiv').css('display', 'block')
               $('#gradeOption').css('display', 'block')
+              $('#binOption').css('display', 'none')
               //$('#infoTableDiv').css('display', 'block')
               $('#fileSubmitDiv').css('display', 'none')
               // console.log(res);
@@ -336,23 +339,23 @@ $(document).ready(function () {
               let histData = [];
               for (let i = 0; i < binNum; i++){
                 var new_data = {};
-                new_data.country = (histMin+(i*binSize)).toString()
-                new_data.visits = 0;
+                new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
+                new_data.frequency = 0;
                 histData.push(new_data);
               }
 
               for (let i = 0; i < outputData.length; i++) {
                 for (let j = 0; j < binNum; j++){
-                  let minBoundary = parseFloat(histData[j].country)
+                  let minBoundary = parseFloat(histData[j].boundary)
                   if (j!=binNum-1) {
-                    let maxBoundary = parseFloat(histData[j+1].country)
+                    let maxBoundary = parseFloat(histData[j+1].boundary)
                     if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
-                      histData[j].visits = histData[j].visits+1;
+                      histData[j].frequency = histData[j].frequency+1;
                       break;
                     }
                   } else {
                     if (outputData[i].score>=minBoundary) {
-                      histData[j].visits = histData[j].visits+1;
+                      histData[j].frequency = histData[j].frequency+1;
                       break;
                     }
                   }
@@ -368,15 +371,22 @@ $(document).ready(function () {
           });
   })
 
+  $('#binSlider').change(function () {
+    var value = $('#binSlider').val();
+    $('#binSize').text(value);
+  });
+
   $('#showOverallChartBtn').click(function () {
     $('#chartDiv').css('display', 'block')
     $('#gradeOption').css('display', 'block')
     $('#histDiv').css('display', 'none')
+    $('#binOption').css('display', 'none')
     $('#weightingChartDiv').css('display', 'none')
   })
 
   $('#showOverallHistBtn').click(function () {
     $('#histDiv').css('display', 'block')
+    $('#binOption').css('display', 'block')
     $('#chartDiv').css('display', 'none')
     $('#gradeOption').css('display', 'none')
     $('#weightingChartDiv').css('display', 'none')
@@ -387,6 +397,44 @@ $(document).ready(function () {
     $('#chartDiv').css('display', 'none')
     $('#gradeOption').css('display', 'none')
     $('#histDiv').css('display', 'none')
+    $('#binOption').css('display', 'none')
+  })
+
+  $('#changeBinSizeBtn').click(function () {
+    var value = $('#binSlider').val();
+    let histMax = Math.ceil(max/5)*5;
+    let histMin = Math.floor(min/5)*5;
+
+    let binNum = value;
+    let binSize = (histMax - histMin)/binNum;
+
+    let histData = [];
+    for (let i = 0; i < binNum; i++){
+      var new_data = {};
+      new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
+      new_data.frequency = 0;
+      histData.push(new_data);
+    }
+
+    for (let i = 0; i < outputData.length; i++) {
+      for (let j = 0; j < binNum; j++){
+        let minBoundary = parseFloat(histData[j].boundary)
+        if (j!=binNum-1) {
+          let maxBoundary = parseFloat(histData[j+1].boundary)
+          if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
+            histData[j].frequency = histData[j].frequency+1;
+            break;
+          }
+        } else {
+          if (outputData[i].score>=minBoundary) {
+            histData[j].frequency = histData[j].frequency+1;
+            break;
+          }
+        }
+      }
+    }
+    histChart.data = histData
+    histChart.validateData();
   })
 
   $('#gradeClearBtn').click(function () {
@@ -582,71 +630,21 @@ $(document).ready(function () {
   }
 
   function initWeightingChart() {
-    // weightingChart.data = [{
-    //   "component": "asg1",
-    //   "weighting": 10
-    // }, {
-    //   "component": "asg2",
-    //   "weighting": 10
-    // }, {
-    //   "component": "asg3",
-    //   "weighting": 10
-    // }, {
-    //   "component": "project",
-    //   "weighting": 20
-    // }, {
-    //   "component": "final",
-    //   "weighting": 50
-    // }];
-
     var pieSeries = weightingChart.series.push(new am4charts.PieSeries());
     pieSeries.dataFields.value = "weighting";
     pieSeries.dataFields.category = "component";
   }
 
   function initHistChart() {
-    // Add data
-    // histChart.data = [{
-    //   "country": "USA",
-    //   "visits": 2025
-    // }, {
-    //   "country": "China",
-    //   "visits": 1882
-    // }, {
-    //   "country": "Japan",
-    //   "visits": 1809
-    // }, {
-    //   "country": "Germany",
-    //   "visits": 1322
-    // }, {
-    //   "country": "UK",
-    //   "visits": 1122
-    // }, {
-    //   "country": "France",
-    //   "visits": 1114
-    // }, {
-    //   "country": "India",
-    //   "visits": 984
-    // }, {
-    //   "country": "Spain",
-    //   "visits": 711
-    // }, {
-    //   "country": "Netherlands",
-    //   "visits": 665
-    // }, {
-    //   "country": "Russia",
-    //   "visits": 580
-    // }];
-
     // Create axes
     var categoryAxis = histChart.xAxes.push(new am4charts.CategoryAxis());
-    categoryAxis.dataFields.category = "country";
+    categoryAxis.dataFields.category = "boundary";
     categoryAxis.renderer.grid.template.location = 0;
     categoryAxis.renderer.minGridDistance = 30;
 
     categoryAxis.renderer.labels.template.adapter.add("dy", function(dy, target) {
       if (target.dataItem && target.dataItem.index & 2 == 2) {
-        return dy + 25;
+        return dy + 20;
       }
       return dy;
     });
@@ -655,9 +653,9 @@ $(document).ready(function () {
 
     // Create series
     var series = histChart.series.push(new am4charts.ColumnSeries());
-    series.dataFields.valueY = "visits";
-    series.dataFields.categoryX = "country";
-    series.name = "Visits";
+    series.dataFields.valueY = "frequency";
+    series.dataFields.categoryX = "boundary";
+    series.name = "Frequency";
     series.columns.template.tooltipText = "{categoryX}: [bold]{valueY}[/]";
     series.columns.template.fillOpacity = .8;
 

@@ -330,6 +330,7 @@ $(document).ready(function () {
               }
               /* weighting table data */
               weightingChart.data = tmpData
+              console.log(tmpData);
 
               var changeSettingEl = []
               for (let i in tmpData) {
@@ -378,6 +379,7 @@ $(document).ready(function () {
                 }
               }
               //histData.pop();
+              /* histogram data */
               histChart.data = histData
 
               initChart();
@@ -471,6 +473,30 @@ $(document).ready(function () {
 
   $('#overall-overallTable tbody').click(function (e){
     moveCursor (chart, e.target.innerHTML)
+  })
+
+  $('#changeWeightingBtn').click(function () {
+    let weightData = [];
+    console.log(getNewWeighting());
+    console.log(getCsvFields());
+    var inputWeighting = getNewWeighting();
+    var inputFields = getCsvFields();
+
+    for (let i = 0; i < inputWeighting.length; i++) {
+      var newWeighting = {};
+      if (inputWeighting[i] > 0) {
+        newWeighting.component = inputFields[i];
+        newWeighting.weighting = inputWeighting[i];
+        weightData.push(newWeighting);
+      }
+    }
+    console.log(weightData)
+
+    weightingChart.data = weightData
+    // chart.validateData();
+    weightingChart.validateData()
+
+    // initWeightingChart()
   })
 
   function initChart() {
@@ -1053,6 +1079,16 @@ function suggestSetting() {
 function getWeighting () {
   var weighting = [];
   $('#settingTable tbody tr').each(function (key, item) {
+    weighting.push(Number($(item).find('input').val()) / 100.0);
+  });
+
+  return weighting;
+}
+
+/* get weighting from setting table */
+function getNewWeighting () {
+  var weighting = [];
+  $('#changeSettingTable tbody tr').each(function (key, item) {
     weighting.push(Number($(item).find('input').val()) / 100.0);
   });
 

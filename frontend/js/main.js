@@ -95,13 +95,12 @@ $(document).ready(function () {
             } else if (tableWeighting !== 100) {
               alert('Toal weighting not equal to 100%. Please check again.');
             } else {
-              /* calculate weighted score */
+              /*** calculate weighted score ***/
               var inputWeighting = getWeighting();
               var inputFields = getCsvFields();
               console.log(inputWeighting);
               console.log(inputFields);
               outputData = calculateWeightedScore(res, inputWeighting, inputFields);
-              /* end of calculating weighted score */
 
               // var chartData = new Object();
               // var jsonData = {};
@@ -113,6 +112,8 @@ $(document).ready(function () {
               //     jsonData[columnName] = column.value;
               // });
               // viewData.employees.push(jsonData);
+
+              /*** create tab content ***/
               var tabItems = []
               $('#settingTable tbody tr').each(function (key, item) {
                 if($(item).find('input').val() != ''){
@@ -179,7 +180,7 @@ $(document).ready(function () {
               $('#myTab').prepend(tabNav);
               $('#myTabContent').prepend(tabContent);
 
-              //init table
+              /*** create stat data (csv fields) ***/
               for (var i in tabItems) {
                 console.log("tabItems: "+tabItems[i])
                 let infoTable = []
@@ -237,20 +238,17 @@ $(document).ready(function () {
               $('#fileSubmitDiv').css('display', 'none')
               // console.log(res);
 
-              // selectionSort(res);
+
               selectionSort(outputData);
               let infoTable = [];
               let data = [];
 
-              // for (let i in res) {
-              //   scores.push(parseInt(res[i].score));
-              //   unselectedScore.push(parseInt(res[i].score));
-              // }
               for (let i in outputData) {
                 scores.push(Number(outputData[i].score));
                 unselectedScore.push(Number(outputData[i].score));
               }
 
+              /*** create stat data (overall) ***/
               $('#overall-statsTable #count').html(scores.length);
 
               // mean = calculateMeanScore(scores);
@@ -316,7 +314,7 @@ $(document).ready(function () {
               }
               $('#overall-overallTable tbody').html(infoTable);
               console.log(data);
-              /* overall table data */
+              /*** overall table data ***/
               chart.data = data;
 
               let tmpData = [];
@@ -328,7 +326,7 @@ $(document).ready(function () {
                   tmpData.push(new_data);
                 }
               }
-              /* weighting table data */
+              /*** weighting table data ***/
               weightingChart.data = tmpData
               console.log(tmpData);
 
@@ -379,7 +377,7 @@ $(document).ready(function () {
                 }
               }
               //histData.pop();
-              /* histogram data */
+              /*** histogram data ***/
               histChart.data = histData
 
               initChart();
@@ -493,7 +491,6 @@ $(document).ready(function () {
     console.log(weightData)
 
     weightingChart.data = weightData
-    // chart.validateData();
     weightingChart.validateData()
 
     // initWeightingChart()
@@ -728,7 +725,7 @@ window.onscroll = function () {
   scrollFunction()
 };
 
-/* Scroll to the top of the page */
+/*** Scroll to the top of the page ***/
 function scrollFunction () {
   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
     $('#backToTopBtn').css('display', 'block')
@@ -741,7 +738,7 @@ function topFunction () {
   document.documentElement.scrollTop = 0;
 }
 
-/* Statistics Function */
+/*** Statistics Function ***/
 function calculateMeanScore (scores) {
   var total = 0.0;
   for (var i = 0; i < scores.length; i++) {
@@ -837,6 +834,9 @@ function calculateMedian (scores) {
   	return (scores[half - 1] + scores[half]) / 2.0;
 }
 function calculateWeightedScore (inputdata, inputWeighting, inputFields) {
+  console.log(inputdata);
+  console.log(inputWeighting);
+  console.log(inputFields);
   var output = []
   inputdata.forEach(function (student, index) {
     let tmpScore = 0;
@@ -854,7 +854,7 @@ function calculateWeightedScore (inputdata, inputWeighting, inputFields) {
   return output;
 }
 
-/* Chart Function */
+/*** Chart Function ***/
 function selectColor (label) {
   var gradeColor = {
     "A+": "#0080ff",
@@ -992,7 +992,7 @@ function setGrade (chart, gradeRange) {
   $('#overall-overallTable tbody').html(infoTable);
 }
 
-/* Sorting */
+/*** Sorting ***/
 function selectionSort (arr) {
   var minIdx, temp,
       len = arr.length;
@@ -1010,7 +1010,7 @@ function selectionSort (arr) {
   return arr;
 }
 
-/* handle select form option onchange */
+/*** handle select form option onchange ***/
 function selectOnchange(elmt) {
   console.log(elmt);
   if ($(elmt).val() === 'sid' || $(elmt).val() === 'ignore') {
@@ -1075,7 +1075,7 @@ function suggestSetting() {
   });
 }
 
-/* get weighting from setting table */
+/*** get weighting from setting table ***/
 function getWeighting () {
   var weighting = [];
   $('#settingTable tbody tr').each(function (key, item) {
@@ -1085,7 +1085,7 @@ function getWeighting () {
   return weighting;
 }
 
-/* get weighting from setting table */
+/*** get weighting from setting table ***/
 function getNewWeighting () {
   var weighting = [];
   $('#changeSettingTable tbody tr').each(function (key, item) {

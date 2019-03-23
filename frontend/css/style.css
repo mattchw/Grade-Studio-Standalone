@@ -42,6 +42,8 @@ html, body {
 
 #changeSettingDiv {
   display: none;
+  margin: 5px;
+  border: solid;
 }
 
 #gradeOption {

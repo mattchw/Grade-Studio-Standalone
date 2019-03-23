@@ -453,6 +453,7 @@ $(document).ready(function () {
       }
     }
     histChart.data = histData
+    console.log(histChart.data);
     histChart.validateData();
   })
 

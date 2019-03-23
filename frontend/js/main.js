@@ -286,35 +286,31 @@ $(document).ready(function () {
               lowerQ = Quartile_25(scores);
               $('#overall-statsTable #lowerQ').html(lowerQ.toFixed(2));
               console.log("Lower Quartile: "+lowerQ);
-              // for (let i = 0; i < res.length; i++) {
-              //   var new_data = {};
-              //   new_data.sid = res[i].sid;
-              //   new_data.score = res[i].score;
-              //   new_data.value = NormalDensityZx(scores[i], mean, stdDev);
-              //   new_data.grade = '';
-              //   data.push(new_data);
-              //   let infoTableElement = `<tr>
-              //     <th scope="row">${res[i].sid}</th>
-              //     <td>${res[i].score}</td>
-              //     <td></td>
-              //   </tr>`;
-              //   infoTable.push(infoTableElement);
-              // }
+
+              // init overall-overallTable
+              let overallDataSet = [];
               for (let i = 0; i < outputData.length; i++) {
                 var new_data = {};
+                let overallData = [];
                 new_data.sid = outputData[i].sid;
                 new_data.score = outputData[i].score;
                 new_data.value = NormalDensityZx(scores[i], mean, stdDev);
                 new_data.grade = '';
                 data.push(new_data);
-                let infoTableElement = `<tr>
-                  <th scope="row">${outputData[i].sid}</th>
-                  <td>${outputData[i].score.toFixed(2)}</td>
-                  <td></td>
-                </tr>`;
-                infoTable.push(infoTableElement);
+
+                overallData.push(outputData[i].sid);
+                overallData.push(outputData[i].score.toFixed(2));
+                overallData.push('');
+                overallDataSet.push(overallData);
               }
-              $('#overall-overallTable tbody').html(infoTable);
+              $('#overall-overallTable').DataTable({
+                  data: overallDataSet,
+                  columns: [
+                      { title: "SID" },
+                      { title: "Score" },
+                      { title: "Grade" }
+                  ]
+              });
               console.log(data);
               /* overall table data */
               chart.data = data;
@@ -957,14 +953,16 @@ function setGrade (chart, gradeRange) {
   // update table
   let infoTable = [];
   for (let i = 0; i < chart.data.length; i++) {
-    let infoTableElement = `<tr>
-      <th scope="row">${chart.data[i].sid}</th>
-      <td>${chart.data[i].score.toFixed(2)}</td>
-      <td>${chart.data[i].grade}</td>
-      </tr>`;
-    infoTable.push(infoTableElement);
+    $('#overall-overallTable').DataTable().rows().every( function () {
+        var row = this.data();
+
+        if (row[0]==chart.data[i].sid){
+          row[2] = chart.data[i].grade;
+        }
+        this.invalidate();
+    } );
   }
-  $('#overall-overallTable tbody').html(infoTable);
+  $('#overall-overallTable').DataTable().draw();
 }
 
 /* Sorting */

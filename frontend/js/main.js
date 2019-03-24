@@ -164,16 +164,25 @@ $(document).ready(function () {
                     </tr>
                   </tbody>
                 </table>
-                <table class="table table-hover" id="${tabItems[i]}-overallTable">
-                  <thead class="thead-light">
-                    <tr>
-                      <th scope="col">SID</th>
-                      <th scope="col">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
+                <div class="card mb-3">
+                  <div class="card-header">
+                    <i class="fas fa-table"></i>
+                    Overall Table</div>
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-hover" id="${tabItems[i]}-overallTable">
+                        <thead class="thead-light">
+                          <tr>
+                            <th scope="col">SID</th>
+                            <th scope="col">Score</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
                 </div>`;
                 tabContent.push(tabContentElement);
               }
@@ -225,6 +234,7 @@ $(document).ready(function () {
                 $('#'+tabItems[i]+'-statsTable #median').html(median);
 
                 $('#'+tabItems[i]+'-overallTable tbody').html(infoTable);
+                $('#'+tabItems[i]+'-overallTable').DataTable();
               }
 
               $('#outputDiv').css('display', 'block')

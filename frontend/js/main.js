@@ -16,7 +16,7 @@ $(document).ready(function () {
   var upperQ = -1;
   var lowerQ = -1;
 
-  var unselectedScore = [];
+  // var unselectedScore = [];
 
   $('#binSize').text($('#binSlider').val());
 
@@ -101,6 +101,7 @@ $(document).ready(function () {
               console.log(inputWeighting);
               console.log(inputFields);
               outputData = calculateWeightedScore(res, inputWeighting, inputFields);
+              console.log(outputData);
 
               // var chartData = new Object();
               // var jsonData = {};
@@ -120,6 +121,7 @@ $(document).ready(function () {
                   tabItems.push($(item).find('th').html());
                 }
               });
+              console.log(tabItems);
 
               var tabNav = [];
               var tabContent = [];
@@ -202,8 +204,8 @@ $(document).ready(function () {
                 let median = -1;
 
                 res.forEach(function (student, index) {
-                  console.log(student["sid"])
-                  console.log(student[tabItems[i]]);
+                  // console.log(student["sid"])
+                  // console.log(student[tabItems[i]]);
                   let infoTableElement = `<tr>
                     <th scope="row">${student["sid"]}</th>
                     <td>${student[tabItems[i]]}</td>
@@ -255,7 +257,7 @@ $(document).ready(function () {
 
               for (let i in outputData) {
                 scores.push(Number(outputData[i].score));
-                unselectedScore.push(Number(outputData[i].score));
+                // unselectedScore.push(Number(outputData[i].score));
               }
 
               /*** create stat data (overall) ***/
@@ -337,15 +339,26 @@ $(document).ready(function () {
               console.log(tmpData);
 
               var changeSettingEl = []
-              for (let i in tmpData) {
-                console.log(tmpData[i])
-                let changeSettingTableRow = `<tr>
-                  <th scope="row">${tmpData[i].component}</th>
-                  <td>
-                    <input class="form-control" id="changeWeighting-${i}" value="${tmpData[i].weighting * 100}" type="number" min="1" max="100">
-                  </td>
-                </tr>`
-                changeSettingEl.push(changeSettingTableRow)
+              for (let i in inputFields) {
+                console.log(inputFields[i])
+                if (inputWeighting[i] === 0) {
+                  let changeSettingTableRow = `<tr>
+                    <th scope="row">${inputFields[i]}</th>
+                    <td>
+                      <input class="form-control" id="changeWeighting-${i}" value="${inputWeighting[i] * 100}" disabled="true" type="number" min="1" max="100">
+                    </td>
+                  </tr>`
+                  changeSettingEl.push(changeSettingTableRow)
+                } else {
+                  let changeSettingTableRow = `<tr>
+                    <th scope="row">${inputFields[i]}</th>
+                    <td>
+                      <input class="form-control" id="changeWeighting-${i}" value="${inputWeighting[i] * 100}" type="number" min="1" max="100">
+                    </td>
+                  </tr>`
+                  changeSettingEl.push(changeSettingTableRow)
+                }
+
               }
               $('#changeSettingTable tbody').html(changeSettingEl);
 
@@ -481,26 +494,143 @@ $(document).ready(function () {
   })
 
   $('#changeWeightingBtn').click(function () {
-    let weightData = [];
-    console.log(getWeighting('new'));
-    console.log(getCsvFields());
-    var inputWeighting = getWeighting('new');
-    var inputFields = getCsvFields('new');
+    let newScores = [];
 
-    for (let i = 0; i < inputWeighting.length; i++) {
-      var newWeighting = {};
-      if (inputWeighting[i] > 0) {
-        newWeighting.component = inputFields[i];
-        newWeighting.weighting = inputWeighting[i];
-        weightData.push(newWeighting);
+    $.ajax({
+      url: 'http://localhost:3000/getfile/' + $('#filename').val(),
+      type: 'GET',
+      contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+      processData: false // NEEDED, DON'T OMIT THIS
+    }).done(function (res) {
+      console.log(res);
+
+      let weightData = [];
+      console.log(getWeighting());
+      console.log(getCsvFields());
+      var inputWeighting = getWeighting('new');
+      var inputFields = getCsvFields();
+      var outputData = calculateWeightedScore(res, inputWeighting, inputFields);
+      console.log(outputData);
+
+      selectionSort(outputData);
+      let data = [];
+      for (let i in outputData) {
+        newScores.push(Number(outputData[i].score));
       }
-    }
-    console.log(weightData)
 
-    weightingChart.data = weightData
-    weightingChart.validateData()
+      /*** update stat data (overall) ***/
+      $('#overall-statsTable #count').html(newScores.length);
 
-    // initWeightingChart()
+      let newMean = calculateMeanScore(newScores);
+      $('#overall-statsTable #mean').html(newMean.toFixed(2));
+      console.log('newMean: ' + newMean);
+
+      let newMedian = calculateMedian(newScores);
+      $('#overall-statsTable #median').html(newMedian.toFixed(2));
+
+      let newStdDev = standardDeviation(newScores);
+      $('#overall-statsTable #std').html(newStdDev.toFixed(2));
+      console.log('newStdDev: ' + newStdDev);
+
+      let newMax = Math.max.apply(null, newScores);
+      $('#overall-statsTable #max').html(newMax.toFixed(2));
+      console.log('newMax: ' + newMax);
+
+      let newMin = Math.min.apply(null, newScores);
+      $('#overall-statsTable #min').html(newMin.toFixed(2));
+      console.log('newMin: ' + newMin);
+
+      let newUpperQ = Quartile_75(newScores);
+      $('#overall-statsTable #upperQ').html(newUpperQ.toFixed(2));
+      console.log("Upper Quartile: " + newUpperQ);
+
+      let newLowerQ = Quartile_25(newScores);
+      $('#overall-statsTable #lowerQ').html(newLowerQ.toFixed(2));
+      console.log("Lower Quartile: " + newLowerQ);
+
+      /*** update overall-overallTable ***/
+      let overallDataSet = [];
+      for (let i = 0; i < outputData.length; i++) {
+        var new_data = {};
+        let overallData = [];
+        new_data.sid = outputData[i].sid;
+        new_data.score = outputData[i].score;
+        new_data.value = NormalDensityZx(newScores[i], mean, stdDev);
+        new_data.grade = '';
+        data.push(new_data);
+
+        overallData.push(outputData[i].sid);
+        overallData.push(outputData[i].score.toFixed(2));
+        overallData.push('');
+        overallDataSet.push(overallData);
+      }
+      let overallDataTable = $('#overall-overallTable').DataTable();
+      overallDataTable.destroy();
+      overallDataTable = $('#overall-overallTable').DataTable({
+          data: overallDataSet,
+          columns: [
+              { title: "SID" },
+              { title: "Score" },
+              { title: "Grade" }
+          ]
+      });
+
+      /*** update (bell curve) chart  ***/
+      chart.data = data;
+      chart.validateData();
+
+      /*** update weightingChart ***/
+      var newInputWeighting = getWeighting('new');
+      var newInputFields = getCsvFields('new');
+      for (let i = 0; i < newInputWeighting.length; i++) {
+        var newWeighting = {};
+        if (newInputWeighting[i] > 0) {
+          newWeighting.component = newInputFields[i];
+          newWeighting.weighting = newInputWeighting[i];
+          weightData.push(newWeighting);
+        }
+      }
+      console.log(weightData);
+      weightingChart.data = weightData;
+      weightingChart.validateData();
+
+
+      let histMax = Math.ceil(newMax/5)*5;
+      let histMin = Math.floor(newMin/5)*5;
+      console.log("max: "+histMax+" min: "+histMin);
+      let binNum = 10;
+      let binSize = (histMax - histMin)/binNum;
+      console.log("bin size: "+binSize)
+
+      let histData = [];
+      for (let i = 0; i < binNum; i++){
+        var new_data = {};
+        new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
+        new_data.frequency = 0;
+        histData.push(new_data);
+      }
+
+      for (let i = 0; i < outputData.length; i++) {
+        for (let j = 0; j < binNum; j++){
+          let minBoundary = parseFloat(histData[j].boundary)
+          if (j!=binNum-1) {
+            let maxBoundary = parseFloat(histData[j+1].boundary)
+            if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
+              histData[j].frequency = histData[j].frequency+1;
+              break;
+            }
+          } else {
+            if (outputData[i].score>=minBoundary) {
+              histData[j].frequency = histData[j].frequency+1;
+              break;
+            }
+          }
+        }
+      }
+      histChart.data = histData
+      histChart.validateData();
+
+    });
   })
 
   function initChart() {
@@ -733,17 +863,17 @@ window.onscroll = function () {
 };
 
 /*** Scroll to the top of the page ***/
-function scrollFunction () {
-  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    $('#backToTopBtn').css('display', 'block')
-  } else {
-    $('#backToTopBtn').css('display', 'none')
-  }
-}
-function topFunction () {
-  document.body.scrollTop = 0;
-  document.documentElement.scrollTop = 0;
-}
+// function scrollFunction () {
+//   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+//     $('#backToTopBtn').css('display', 'block')
+//   } else {
+//     $('#backToTopBtn').css('display', 'none')
+//   }
+// }
+// function topFunction () {
+//   document.body.scrollTop = 0;
+//   document.documentElement.scrollTop = 0;
+// }
 
 /*** Statistics Function ***/
 function calculateMeanScore (scores) {

@@ -482,9 +482,9 @@ $(document).ready(function () {
 
   $('#changeWeightingBtn').click(function () {
     let weightData = [];
-    console.log(getNewWeighting());
+    console.log(getWeighting('new'));
     console.log(getCsvFields());
-    var inputWeighting = getNewWeighting();
+    var inputWeighting = getWeighting('new');
     var inputFields = getCsvFields('new');
 
     for (let i = 0; i < inputWeighting.length; i++) {
@@ -1091,27 +1091,29 @@ function getOrgData () {
 }
 
 /*** get weighting from setting table ***/
-function getWeighting () {
+function getWeighting (option) {
   var weighting = [];
-  $('#settingTable tbody tr').each(function (key, item) {
-    weighting.push(Number($(item).find('input').val()) / 100.0);
-  });
 
-  return weighting;
-}
-
-/*** get weighting from setting table ***/
-function getNewWeighting () {
-  var weighting = [];
-  $('#changeSettingTable tbody tr').each(function (key, item) {
-    weighting.push(Number($(item).find('input').val()) / 100.0);
-  });
+  /*** option = 'new' --> get from new setting table ***/
+  /*** option = null  --> get from original setting page table ***/
+  if (option) {
+    $('#changeSettingTable tbody tr').each(function (key, item) {
+      weighting.push(Number($(item).find('input').val()) / 100.0);
+    });
+  } else {
+    $('#settingTable tbody tr').each(function (key, item) {
+      weighting.push(Number($(item).find('input').val()) / 100.0);
+    });
+  }
 
   return weighting;
 }
 
 function getCsvFields (option) {
   var fields = [];
+
+  /*** option = 'new' --> get from new setting table ***/
+  /*** option = null  --> get from original data ***/
   if (option) {
     $('#changeSettingTable tbody tr').each(function (key, item) {
       fields.push($(item).find('th').html());

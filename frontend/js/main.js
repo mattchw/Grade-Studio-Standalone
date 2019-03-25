@@ -477,7 +477,6 @@ $(document).ready(function () {
       weightingChart.validateData();
 
       /*** update histChart ***/
-      // setHistChartData (10);
 
       let histMax = Math.ceil(max/5)*5;
       let histMin = Math.floor(min/5)*5;

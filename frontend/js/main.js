@@ -287,18 +287,8 @@ $(document).ready(function () {
               /*** overall table data ***/
               chart.data = data;
 
-              let weightData = [];
-              for (let i = 0; i < inputWeighting.length; i++) {
-                var new_data = {};
-                if (inputWeighting[i]>0){
-                  new_data.component = inputFields[i];
-                  new_data.weighting = inputWeighting[i];
-                  weightData.push(new_data);
-                }
-              }
               /*** weighting table data ***/
-              weightingChart.data = weightData
-              console.log(weightData);
+              weightingChart.data = calculateWeightChartData(inputWeighting, inputFields);
 
               var changeSettingEl = []
               for (let i in inputFields) {
@@ -357,7 +347,7 @@ $(document).ready(function () {
               //     }
               //   }
               // }
-              // //histData.pop();
+
               // /*** histogram data ***/
               // histChart.data = histData
               setHistChartData (10);
@@ -425,8 +415,6 @@ $(document).ready(function () {
   })
 
   $('#changeWeightingBtn').click(function () {
-    // let newScores = [];
-
     $.ajax({
       url: 'http://localhost:3000/getfile/' + $('#filename').val(),
       type: 'GET',
@@ -435,7 +423,6 @@ $(document).ready(function () {
     }).done(function (res) {
       console.log(res);
 
-      let weightData = [];
       var inputWeighting = getWeighting('new');
       var inputFields = getCsvFields('new');
       var outputData = calculateWeightedScore(res, inputWeighting, inputFields);
@@ -444,9 +431,8 @@ $(document).ready(function () {
       selectionSort(outputData);
       let data = [];
 
-      scores.length = 0;
+      scores.length = 0;  // empty original scores array
       for (let i in outputData) {
-        // newScores.push(Number(outputData[i].score));
         scores.push(Number(outputData[i].score));
       }
 
@@ -469,9 +455,9 @@ $(document).ready(function () {
         overallData.push('');
         overallDataSet.push(overallData);
       }
-      // destroy the original datatable before reinitializing
+
       let overallDataTable = $('#overall-overallTable').DataTable();
-      overallDataTable.destroy();
+      overallDataTable.destroy(); // destroy the original datatable before reinitializing
 
       overallDataTable = $('#overall-overallTable').DataTable({
           data: overallDataSet,
@@ -487,16 +473,7 @@ $(document).ready(function () {
       chart.validateData();
 
       /*** update weightingChart ***/
-      for (let i = 0; i < inputWeighting.length; i++) {
-        var newWeighting = {};
-        if (inputWeighting[i] > 0) {
-          newWeighting.component = inputFields[i];
-          newWeighting.weighting = inputWeighting[i];
-          weightData.push(newWeighting);
-        }
-      }
-      console.log(weightData);
-      weightingChart.data = weightData;
+      weightingChart.data = calculateWeightChartData(inputWeighting, inputFields);
       weightingChart.validateData();
 
       /*** update histChart ***/
@@ -1151,6 +1128,19 @@ function suggestSetting() {
 function getOrgData () {
   var orgData = {};
 
+}
+
+function calculateWeightChartData (weight, fields) {
+  let weightData = [];
+  for (let i = 0; i < weight.length; i++) {
+    var newWeighting = {};
+    if (weight[i] > 0) {
+      newWeighting.component = fields[i];
+      newWeighting.weighting = weight[i];
+      weightData.push(newWeighting);
+    }
+  }
+  return weightData;
 }
 
 /*** get weighting from setting table ***/

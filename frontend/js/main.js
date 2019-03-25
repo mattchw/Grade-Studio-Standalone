@@ -485,7 +485,7 @@ $(document).ready(function () {
     console.log(getNewWeighting());
     console.log(getCsvFields());
     var inputWeighting = getNewWeighting();
-    var inputFields = getCsvFields();
+    var inputFields = getCsvFields('new');
 
     for (let i = 0; i < inputWeighting.length; i++) {
       var newWeighting = {};
@@ -1084,6 +1084,12 @@ function suggestSetting() {
   });
 }
 
+/*** get original data ***/
+function getOrgData () {
+  var orgData = {};
+
+}
+
 /*** get weighting from setting table ***/
 function getWeighting () {
   var weighting = [];
@@ -1104,11 +1110,17 @@ function getNewWeighting () {
   return weighting;
 }
 
-function getCsvFields () {
+function getCsvFields (option) {
   var fields = [];
-  $('#settingTable tbody tr').each(function (key, item) {
-    fields.push($(item).find('th').html());
-  });
+  if (option) {
+    $('#changeSettingTable tbody tr').each(function (key, item) {
+      fields.push($(item).find('th').html());
+    });
+  } else {
+    $('#settingTable tbody tr').each(function (key, item) {
+      fields.push($(item).find('th').html());
+    });
+  }
 
   return fields;
 }

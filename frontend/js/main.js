@@ -477,7 +477,42 @@ $(document).ready(function () {
       weightingChart.validateData();
 
       /*** update histChart ***/
-      setHistChartData (10);
+      // setHistChartData (10);
+
+      let histMax = Math.ceil(max/5)*5;
+      let histMin = Math.floor(min/5)*5;
+      console.log("max: "+histMax+" min: "+histMin);
+      let binNum = 10;
+      let binSize = (histMax - histMin)/binNum;
+      console.log("bin size: "+binSize)
+
+      let histData = [];
+      for (let i = 0; i < binNum; i++){
+        var new_data = {};
+        new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
+        new_data.frequency = 0;
+        histData.push(new_data);
+      }
+
+      for (let i = 0; i < outputData.length; i++) {
+        for (let j = 0; j < binNum; j++){
+          let minBoundary = parseFloat(histData[j].boundary)
+          if (j!=binNum-1) {
+            let maxBoundary = parseFloat(histData[j+1].boundary)
+            if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
+              histData[j].frequency = histData[j].frequency+1;
+              break;
+            }
+          } else {
+            if (outputData[i].score>=minBoundary) {
+              histData[j].frequency = histData[j].frequency+1;
+              break;
+            }
+          }
+        }
+      }
+      /*** histogram data ***/
+      histChart.data = histData
       histChart.validateData();
 
     });

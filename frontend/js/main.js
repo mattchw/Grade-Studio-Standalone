@@ -217,9 +217,6 @@ $(document).ready(function () {
                 mean = calculateMeanScore(scores);
                 $('#'+tabItems[i]+'-statsTable #mean').html(mean.toFixed(2));
 
-                median = calculateMedian(scores);
-                $('#'+tabItems[i]+'-statsTable #median').html(median.toFixed(2));
-
                 // stdDev = standardDeviation(scores);
                 stdDev = standardDeviation(scores);
                 $('#'+tabItems[i]+'-statsTable #std').html(stdDev.toFixed(2));
@@ -257,45 +254,10 @@ $(document).ready(function () {
 
               for (let i in outputData) {
                 scores.push(Number(outputData[i].score));
-                // unselectedScore.push(Number(outputData[i].score));
               }
 
               /*** create stat data (overall) ***/
-              $('#overall-statsTable #count').html(scores.length);
-
-              // mean = calculateMeanScore(scores);
-              mean = calculateMeanScore(scores);
-              $('#overall-statsTable #mean').html(mean.toFixed(2));
-              console.log('mean: ' + mean);
-
-              median = calculateMedian(scores);
-              $('#overall-statsTable #median').html(median.toFixed(2));
-
-              // stdDev = standardDeviation(scores);
-              stdDev = standardDeviation(scores);
-              $('#overall-statsTable #std').html(stdDev.toFixed(2));
-              console.log('stdDev: ' + stdDev);
-
-              // max = Math.max.apply(null, scores);
-              max = Math.max.apply(null, scores);
-              $('#overall-statsTable #max').html(max.toFixed(2));
-              console.log('max: ' + max);
-
-              // min = Math.min.apply(null, scores);
-              min = Math.min.apply(null, scores);
-              $('#overall-statsTable #min').html(min.toFixed(2));
-              console.log('min: ' + min);
-
-              median = calculateMedian(scores);
-              $('#overall-statsTable #median').html(median.toFixed(2));
-
-              upperQ = Quartile_75(scores);
-              $('#overall-statsTable #upperQ').html(upperQ.toFixed(2));
-              console.log("Upper Quartile: "+upperQ);
-
-              lowerQ = Quartile_25(scores);
-              $('#overall-statsTable #lowerQ').html(lowerQ.toFixed(2));
-              console.log("Lower Quartile: "+lowerQ);
+              setOverallStat();
 
               // init overall-overallTable
               let overallDataSet = [];
@@ -325,18 +287,18 @@ $(document).ready(function () {
               /*** overall table data ***/
               chart.data = data;
 
-              let tmpData = [];
+              let weightData = [];
               for (let i = 0; i < inputWeighting.length; i++) {
                 var new_data = {};
                 if (inputWeighting[i]>0){
                   new_data.component = inputFields[i];
                   new_data.weighting = inputWeighting[i];
-                  tmpData.push(new_data);
+                  weightData.push(new_data);
                 }
               }
               /*** weighting table data ***/
-              weightingChart.data = tmpData
-              console.log(tmpData);
+              weightingChart.data = weightData
+              console.log(weightData);
 
               var changeSettingEl = []
               for (let i in inputFields) {
@@ -494,7 +456,7 @@ $(document).ready(function () {
   })
 
   $('#changeWeightingBtn').click(function () {
-    let newScores = [];
+    // let newScores = [];
 
     $.ajax({
       url: 'http://localhost:3000/getfile/' + $('#filename').val(),
@@ -505,48 +467,22 @@ $(document).ready(function () {
       console.log(res);
 
       let weightData = [];
-      console.log(getWeighting());
-      console.log(getCsvFields());
       var inputWeighting = getWeighting('new');
-      var inputFields = getCsvFields();
+      var inputFields = getCsvFields('new');
       var outputData = calculateWeightedScore(res, inputWeighting, inputFields);
       console.log(outputData);
 
       selectionSort(outputData);
       let data = [];
+
+      scores.length = 0;
       for (let i in outputData) {
-        newScores.push(Number(outputData[i].score));
+        // newScores.push(Number(outputData[i].score));
+        scores.push(Number(outputData[i].score));
       }
 
       /*** update stat data (overall) ***/
-      $('#overall-statsTable #count').html(newScores.length);
-
-      let newMean = calculateMeanScore(newScores);
-      $('#overall-statsTable #mean').html(newMean.toFixed(2));
-      console.log('newMean: ' + newMean);
-
-      let newMedian = calculateMedian(newScores);
-      $('#overall-statsTable #median').html(newMedian.toFixed(2));
-
-      let newStdDev = standardDeviation(newScores);
-      $('#overall-statsTable #std').html(newStdDev.toFixed(2));
-      console.log('newStdDev: ' + newStdDev);
-
-      let newMax = Math.max.apply(null, newScores);
-      $('#overall-statsTable #max').html(newMax.toFixed(2));
-      console.log('newMax: ' + newMax);
-
-      let newMin = Math.min.apply(null, newScores);
-      $('#overall-statsTable #min').html(newMin.toFixed(2));
-      console.log('newMin: ' + newMin);
-
-      let newUpperQ = Quartile_75(newScores);
-      $('#overall-statsTable #upperQ').html(newUpperQ.toFixed(2));
-      console.log("Upper Quartile: " + newUpperQ);
-
-      let newLowerQ = Quartile_25(newScores);
-      $('#overall-statsTable #lowerQ').html(newLowerQ.toFixed(2));
-      console.log("Lower Quartile: " + newLowerQ);
+      setOverallStat();
 
       /*** update overall-overallTable ***/
       let overallDataSet = [];
@@ -555,7 +491,7 @@ $(document).ready(function () {
         let overallData = [];
         new_data.sid = outputData[i].sid;
         new_data.score = outputData[i].score;
-        new_data.value = NormalDensityZx(newScores[i], mean, stdDev);
+        new_data.value = NormalDensityZx(scores[i], mean, stdDev);
         new_data.grade = '';
         data.push(new_data);
 
@@ -564,8 +500,10 @@ $(document).ready(function () {
         overallData.push('');
         overallDataSet.push(overallData);
       }
+      // destroy the original datatable before reinitializing
       let overallDataTable = $('#overall-overallTable').DataTable();
       overallDataTable.destroy();
+
       overallDataTable = $('#overall-overallTable').DataTable({
           data: overallDataSet,
           columns: [
@@ -580,13 +518,11 @@ $(document).ready(function () {
       chart.validateData();
 
       /*** update weightingChart ***/
-      var newInputWeighting = getWeighting('new');
-      var newInputFields = getCsvFields('new');
-      for (let i = 0; i < newInputWeighting.length; i++) {
+      for (let i = 0; i < inputWeighting.length; i++) {
         var newWeighting = {};
-        if (newInputWeighting[i] > 0) {
-          newWeighting.component = newInputFields[i];
-          newWeighting.weighting = newInputWeighting[i];
+        if (inputWeighting[i] > 0) {
+          newWeighting.component = inputFields[i];
+          newWeighting.weighting = inputWeighting[i];
           weightData.push(newWeighting);
         }
       }
@@ -594,9 +530,9 @@ $(document).ready(function () {
       weightingChart.data = weightData;
       weightingChart.validateData();
 
-
-      let histMax = Math.ceil(newMax/5)*5;
-      let histMin = Math.floor(newMin/5)*5;
+      /*** update histChart ***/
+      let histMax = Math.ceil(max/5)*5;
+      let histMin = Math.floor(min/5)*5;
       console.log("max: "+histMax+" min: "+histMin);
       let binNum = 10;
       let binSize = (histMax - histMin)/binNum;
@@ -843,26 +779,48 @@ $(document).ready(function () {
     columnTemplate.strokeOpacity = 1;
   }
 
-})
+  function setOverallStat () {
+    $('#overall-statsTable #count').html(scores.length);
+
+    mean = calculateMeanScore(scores);
+    $('#overall-statsTable #mean').html(mean.toFixed(2));
+    console.log('mean: ' + mean);
+
+    median = calculateMedian(scores);
+    $('#overall-statsTable #median').html(median.toFixed(2));
+
+    stdDev = standardDeviation(scores);
+    $('#overall-statsTable #std').html(stdDev.toFixed(2));
+    console.log('stdDev: ' + stdDev);
+
+    max = Math.max.apply(null, scores);
+    $('#overall-statsTable #max').html(max.toFixed(2));
+    console.log('max: ' + max);
+
+    min = Math.min.apply(null, scores);
+    $('#overall-statsTable #min').html(min.toFixed(2));
+    console.log('min: ' + min);
+
+    upperQ = Quartile_75(scores);
+    $('#overall-statsTable #upperQ').html(upperQ.toFixed(2));
+    console.log("Upper Quartile: "+upperQ);
+
+    lowerQ = Quartile_25(scores);
+    $('#overall-statsTable #lowerQ').html(lowerQ.toFixed(2));
+    console.log("Lower Quartile: "+lowerQ);
+  }
+
+});
+
 
 function alertRefresh () {
   return 0;
 }
 
-function dlSampleFile () {
-  $.ajax({
-    url: '001test_gs.csv',
-    type: 'GET',
-    contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
-    processData: false // NEEDED, DON'T OMIT THIS
-  })
-}
-
-window.onscroll = function () {
-  scrollFunction()
-};
-
 /*** Scroll to the top of the page ***/
+// window.onscroll = function () {
+//   scrollFunction()
+// };
 // function scrollFunction () {
 //   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
 //     $('#backToTopBtn').css('display', 'block')

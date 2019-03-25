@@ -325,41 +325,42 @@ $(document).ready(function () {
               $('#changeSettingTable tbody').html(changeSettingEl);
 
 
-              let histMax = Math.ceil(max/5)*5;
-              let histMin = Math.floor(min/5)*5;
-              console.log("max: "+histMax+" min: "+histMin);
-              let binNum = 10;
-              let binSize = (histMax - histMin)/binNum;
-              console.log("bin size: "+binSize)
-
-              let histData = [];
-              for (let i = 0; i < binNum; i++){
-                var new_data = {};
-                new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
-                new_data.frequency = 0;
-                histData.push(new_data);
-              }
-
-              for (let i = 0; i < outputData.length; i++) {
-                for (let j = 0; j < binNum; j++){
-                  let minBoundary = parseFloat(histData[j].boundary)
-                  if (j!=binNum-1) {
-                    let maxBoundary = parseFloat(histData[j+1].boundary)
-                    if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
-                      histData[j].frequency = histData[j].frequency+1;
-                      break;
-                    }
-                  } else {
-                    if (outputData[i].score>=minBoundary) {
-                      histData[j].frequency = histData[j].frequency+1;
-                      break;
-                    }
-                  }
-                }
-              }
-              //histData.pop();
-              /*** histogram data ***/
-              histChart.data = histData
+              // let histMax = Math.ceil(max/5)*5;
+              // let histMin = Math.floor(min/5)*5;
+              // console.log("max: "+histMax+" min: "+histMin);
+              // let binNum = 10;
+              // let binSize = (histMax - histMin)/binNum;
+              // console.log("bin size: "+binSize)
+              //
+              // let histData = [];
+              // for (let i = 0; i < binNum; i++){
+              //   var new_data = {};
+              //   new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
+              //   new_data.frequency = 0;
+              //   histData.push(new_data);
+              // }
+              //
+              // for (let i = 0; i < outputData.length; i++) {
+              //   for (let j = 0; j < binNum; j++){
+              //     let minBoundary = parseFloat(histData[j].boundary)
+              //     if (j!=binNum-1) {
+              //       let maxBoundary = parseFloat(histData[j+1].boundary)
+              //       if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
+              //         histData[j].frequency = histData[j].frequency+1;
+              //         break;
+              //       }
+              //     } else {
+              //       if (outputData[i].score>=minBoundary) {
+              //         histData[j].frequency = histData[j].frequency+1;
+              //         break;
+              //       }
+              //     }
+              //   }
+              // }
+              // //histData.pop();
+              // /*** histogram data ***/
+              // histChart.data = histData
+              setHistChartData (10);
 
               initChart();
               initWeightingChart();
@@ -402,39 +403,7 @@ $(document).ready(function () {
 
   $('#changeBinSizeBtn').click(function () {
     var value = $('#binSlider').val();
-    let histMax = Math.ceil(max/5)*5;
-    let histMin = Math.floor(min/5)*5;
-
-    let binNum = value;
-    let binSize = (histMax - histMin)/binNum;
-
-    let histData = [];
-    for (let i = 0; i < binNum; i++){
-      var new_data = {};
-      new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
-      new_data.frequency = 0;
-      histData.push(new_data);
-    }
-
-    for (let i = 0; i < outputData.length; i++) {
-      for (let j = 0; j < binNum; j++){
-        let minBoundary = parseFloat(histData[j].boundary)
-        if (j!=binNum-1) {
-          let maxBoundary = parseFloat(histData[j+1].boundary)
-          if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
-            histData[j].frequency = histData[j].frequency+1;
-            break;
-          }
-        } else {
-          if (outputData[i].score>=minBoundary) {
-            histData[j].frequency = histData[j].frequency+1;
-            break;
-          }
-        }
-      }
-    }
-    histChart.data = histData
-    console.log(histChart.data);
+    setHistChartData (value);
     histChart.validateData();
   })
 
@@ -531,39 +500,7 @@ $(document).ready(function () {
       weightingChart.validateData();
 
       /*** update histChart ***/
-      let histMax = Math.ceil(max/5)*5;
-      let histMin = Math.floor(min/5)*5;
-      console.log("max: "+histMax+" min: "+histMin);
-      let binNum = 10;
-      let binSize = (histMax - histMin)/binNum;
-      console.log("bin size: "+binSize)
-
-      let histData = [];
-      for (let i = 0; i < binNum; i++){
-        var new_data = {};
-        new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
-        new_data.frequency = 0;
-        histData.push(new_data);
-      }
-
-      for (let i = 0; i < outputData.length; i++) {
-        for (let j = 0; j < binNum; j++){
-          let minBoundary = parseFloat(histData[j].boundary)
-          if (j!=binNum-1) {
-            let maxBoundary = parseFloat(histData[j+1].boundary)
-            if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
-              histData[j].frequency = histData[j].frequency+1;
-              break;
-            }
-          } else {
-            if (outputData[i].score>=minBoundary) {
-              histData[j].frequency = histData[j].frequency+1;
-              break;
-            }
-          }
-        }
-      }
-      histChart.data = histData
+      setHistChartData (10);
       histChart.validateData();
 
     });
@@ -810,8 +747,46 @@ $(document).ready(function () {
     console.log("Lower Quartile: "+lowerQ);
   }
 
-});
+  function setHistChartData (inputBinNum) {
+    let histMax = Math.ceil(max/5)*5;
+    let histMin = Math.floor(min/5)*5;
+    console.log("max: "+histMax+" min: "+histMin);
+    let binNum = inputBinNum;
+    let binSize = (histMax - histMin)/binNum;
+    console.log("bin size: "+binSize)
 
+    let histData = [];
+    for (let i = 0; i < binNum; i++){
+      var new_data = {};
+      new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
+      new_data.frequency = 0;
+      histData.push(new_data);
+    }
+
+    for (let i = 0; i < outputData.length; i++) {
+      for (let j = 0; j < binNum; j++){
+        let minBoundary = parseFloat(histData[j].boundary)
+        if (j!=binNum-1) {
+          let maxBoundary = parseFloat(histData[j+1].boundary)
+          if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
+            histData[j].frequency = histData[j].frequency+1;
+            break;
+          }
+        } else {
+          if (outputData[i].score>=minBoundary) {
+            histData[j].frequency = histData[j].frequency+1;
+            break;
+          }
+        }
+      }
+    }
+    //histData.pop();
+    /*** histogram data ***/
+    histChart.data = histData
+  }
+
+});
+// end of document ready
 
 function alertRefresh () {
   return 0;

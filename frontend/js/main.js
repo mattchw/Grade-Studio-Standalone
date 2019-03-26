@@ -32,6 +32,7 @@ $(document).ready(function () {
     }).done(function (data) {
       $('#filename').text(data.inputname)
       $('#filename').val(data.filename)
+      $('#topHeader').css('display', 'none')
       $('#fileUploadDiv').css('display', 'none')
       $('#fileSubmitDiv').css('display', 'block')
       $.ajax({

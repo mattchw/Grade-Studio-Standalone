@@ -29,20 +29,44 @@
       </div>
     </nav>
 
-    <div id="fileUploadDiv" class="container-fluid bg-light">
-      <div class="p-3">
-        <div class="row">
-          <h1 class="mx-auto">Please upload your CSV file</h1>
+    <header id="topHeader" class="header">
+        <div class="text-vertical-center">
+            <h1>Grade Studio</h1>
+            <br>
+            <a href="#about" class="btn btn-dark btn-lg">Get Started</a>
         </div>
-        <div class="row custom-file">
-          <!-- <form id="sendFile" method="post" action="http://localhost:3000/uploadfile" encType="multipart/form-data"> -->
-          <form id="sendFile" encType="multipart/form-data">
-            <input type="file" class="form-control-file" name="importfile" accept=".csv">
-          </form>
-          <button class="btn btn-primary mt-2" id="uploadBtn">Upload</button>
+    </header>
+
+    <section id="about">
+      <div id="fileUploadDiv" class="container-fluid bg-light">
+        <div class="p-3">
+          <div id="disclaimer">
+            CONFIDENTIALITY NOTE: Disclaimer info.
+            The content of this email is confidential and intended for the recipient specified in message only. It is strictly forbidden to share any part of this message with any third party, without a written consent of the sender. If you received this message by mistake, please reply to this message and follow with its deletion, so that we can ensure such a mistake does not occur in the future.
+This message has been sent as a part of discussion between [Sender’s name] and the addressee whose name is specified above. Should you receive this message by mistake, we would be most grateful if you informed us that the message has been sent to you. In this case, we also ask that you delete this message from your mailbox, and do not forward it or any part of it to anyone else. Thank you for your cooperation and understanding.
+[Your company] puts the security of the client at a high priority. Therefore, we have put efforts into ensuring that the message is error and virus-free. Unfortunately, full security of the email cannot be ensured as, despite our efforts, the data included in emails could be infected, intercepted, or corrupted. Therefore, the recipient should check the email for threats with proper software, as the sender does not accept liability for any damage inflicted by viewing the content of this email.
+This quotation request is sent to compare available offers and does not imply entering into a legally binding contract.
+No employee of [your company’s name] has the authority to conclude any binding contract without an explicit written consent of their supervisor. Therefore, any will to enter into an agreement must be confirmed by the [Sender’s name]’s manager.
+Please do not print this email unless it is necessary. Every unprinted email helps the environment.
+Is it necessary to print this email? If you care about the environment like we do, please refrain from printing emails. It helps to keep the environment forested and litter-free.
+The views and opinions included in this email belong to their author and do not necessarily mirror the views and opinions of the company. Our employees are obliged not to make any defamatory clauses, infringe, or authorize infringement of any legal right. Therefore, the company will not take any liability for such statements included in emails. In case of any damages or other liabilities arising, employees are fully responsible for the content of their emails.
+You have received this mail because you have subscribed for a newsletter at [your website’s address]. You can always unsubscribe from our mailing list, by clicking on Unsubscribe You can also reply to this message, including unsubscribe in the topic.
+This message is sent to you because your email address is on our subscribers list. If you are not interested in receiving more emails like this one, just hit Unsubscribe.
+Thank you for subscribing to our newsletter. [Your company name] team will work hard to deliver good quality information in the fields you have specified upon subscription. However, if you decide that you no longer want to receive such emails from us, feel free to click the link below. Click here to unsubscribe.
+          </div>
+          <div class="row">
+            <h1 class="mx-auto">Please upload your CSV file</h1>
+          </div>
+          <div class="row custom-file">
+            <!-- <form id="sendFile" method="post" action="http://localhost:3000/uploadfile" encType="multipart/form-data"> -->
+            <form id="sendFile" encType="multipart/form-data">
+              <input type="file" class="form-control-file" name="importfile" accept=".csv">
+            </form>
+            <button class="btn btn-primary mt-2" id="uploadBtn">Upload</button>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <div id="fileSubmitDiv" class="container-fluid bg-light">
       <div class="p-3">
@@ -259,5 +283,18 @@
     <script src="https://www.amcharts.com/lib/4/charts.js"></script>
     <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
     <!-- <script src="./js/chart.js"></script> -->
+    <script>
+    $(function() {
+      $('a[href^="#"]').on('click', function(event) {
+        var target = $(this.getAttribute('href'));
+        if( target.length ) {
+            event.preventDefault();
+            $('html, body').stop().animate({
+                scrollTop: target.offset().top
+            }, 1000);
+        }
+      });
+    });
+    </script>
   </body>
 </html>

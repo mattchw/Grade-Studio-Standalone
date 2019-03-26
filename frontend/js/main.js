@@ -286,6 +286,11 @@ $(document).ready(function () {
               console.log(data);
               /*** overall table data ***/
               chart.data = data;
+              // click event
+              $('#overall-overallTable tbody').on('click', 'tr', function () {
+                  var data = $('#overall-overallTable').DataTable().row( this ).data();
+                  moveCursor (chart, data[0]);
+              } );
 
               /*** weighting table data ***/
               weightingChart.data = calculateWeightChartData(inputWeighting, inputFields);
@@ -410,9 +415,19 @@ $(document).ready(function () {
     setGrade (chart, gradeRange);
   })
 
-  $('#overall-overallTable tbody').click(function (e){
-    moveCursor (chart, e.target.innerHTML)
-  })
+  // $('#overall-overallTable tbody').click(function (e){
+  //   //moveCursor (chart, e.target.innerHTML)
+  //   alert( 'You clicked on row' );
+  // })
+
+//   $( document ).on("click", " tobody tr[role='row']", function(){
+//     alert($(this).children('td:first-child').text())
+// });
+
+  // $('#overall-overallTable tbody').on('click', 'tr', function () {
+  //   var data = table.row( this ).data();
+  //   alert( 'You clicked on '+data[0]+'\'s row' );
+  // });
 
   $('#changeWeightingBtn').click(function () {
     $.ajax({
@@ -1032,7 +1047,7 @@ function moveCursor (chart, sid) {
   for (var i in chart.data){
     if (chart.data[i].sid==sid){
       console.log("found "+sid)
-      topFunction();
+      $("html, body").animate({ scrollTop: 0 }, "slow");
       let point = {
         x: 0,
         y: 0

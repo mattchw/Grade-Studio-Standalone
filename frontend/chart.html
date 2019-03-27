@@ -40,7 +40,7 @@
     <section id="about">
       <div id="fileUploadDiv" class="container-fluid bg-light">
         <div class="p-3">
-          <div id="disclaimer">
+          <!-- <div id="disclaimer">
             CONFIDENTIALITY NOTE: Disclaimer info.
             The content of this email is confidential and intended for the recipient specified in message only. It is strictly forbidden to share any part of this message with any third party, without a written consent of the sender. If you received this message by mistake, please reply to this message and follow with its deletion, so that we can ensure such a mistake does not occur in the future.
 This message has been sent as a part of discussion between [Sender’s name] and the addressee whose name is specified above. Should you receive this message by mistake, we would be most grateful if you informed us that the message has been sent to you. In this case, we also ask that you delete this message from your mailbox, and do not forward it or any part of it to anyone else. Thank you for your cooperation and understanding.
@@ -53,7 +53,7 @@ The views and opinions included in this email belong to their author and do not 
 You have received this mail because you have subscribed for a newsletter at [your website’s address]. You can always unsubscribe from our mailing list, by clicking on Unsubscribe You can also reply to this message, including unsubscribe in the topic.
 This message is sent to you because your email address is on our subscribers list. If you are not interested in receiving more emails like this one, just hit Unsubscribe.
 Thank you for subscribing to our newsletter. [Your company name] team will work hard to deliver good quality information in the fields you have specified upon subscription. However, if you decide that you no longer want to receive such emails from us, feel free to click the link below. Click here to unsubscribe.
-          </div>
+          </div> -->
           <div class="row">
             <h1 class="mx-auto">Please upload your CSV file</h1>
           </div>
@@ -260,6 +260,14 @@ Thank you for subscribing to our newsletter. [Your company name] team will work 
               <i class="fas fa-table"></i>
               Overall Table</div>
             <div class="card-body">
+              <div id="tableChoices" class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-secondary active">
+                  <input type="radio" name="table" value="1" autocomplete="off" checked>Show Student on Chart
+                </label>
+                <label class="btn btn-secondary">
+                  <input type="radio" name="table" value="2" autocomplete="off">Special Handle
+                </label>
+              </div>
               <div class="table-responsive">
                 <table class="table table-hover" id="overall-overallTable">
                 </table>
@@ -271,6 +279,92 @@ Thank you for subscribing to our newsletter. [Your company name] team will work 
 
       <!-- <button onclick="topFunction()" id="backToTopBtn" title="Go to top">Go to top</button> -->
     </div>
+
+    <div id="gradeModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Please Give the Grade</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="container-fluid">
+                <!-- <div class="row mb-2">
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn">A+</button></div>
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn">A</button></div>
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn mx-auto">A-</button></div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn">B+</button></div>
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn">B</button></div>
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn mx-auto">B-</button></div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn">C+</button></div>
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn">C</button></div>
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn mx-auto">C-</button></div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn">D+</button></div>
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn">D</button></div>
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn mx-auto">D-</button></div>
+                </div>
+                <div class="row mb-2">
+                  <div class="col-md-4"><button class="btn btn-info gradeBtn">F</button></div>
+                </div> -->
+                <div id="gradeChoices" class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <label class="btn btn-secondary active">
+                    <input type="radio" name="specialHandle" value="F" autocomplete="off" checked> F
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="D-" autocomplete="off"> D-
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="D" autocomplete="off"> D
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="D+" autocomplete="off"> D+
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="C-" autocomplete="off"> C-
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="C" autocomplete="off"> C
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="C+" autocomplete="off"> C+
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="B-" autocomplete="off"> B-
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="B" autocomplete="off"> B
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="B+" autocomplete="off"> B+
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="A-" autocomplete="off"> A-
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="A" autocomplete="off"> A
+                  </label>
+                  <label class="btn btn-secondary">
+                    <input type="radio" name="specialHandle" value="A+" autocomplete="off"> A+
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="modalCloseBtn" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" id="specialHandleApplyBtn" class="btn btn-info" data-dismiss="modal">Apply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <!-- Resources -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>

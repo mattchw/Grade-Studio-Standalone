@@ -33,7 +33,7 @@ $(document).ready(function () {
       $('#filename').text(data.inputname)
       $('#filename').val(data.filename)
       $('#topHeader').css('display', 'none')
-      $('#fileUploadDiv').css('display', 'none')
+      $('#about').css('display', 'none')
       $('#fileSubmitDiv').css('display', 'block')
       $.ajax({
         url: 'http://localhost:3000/getfile/' + $('#filename').val(),
@@ -288,10 +288,84 @@ $(document).ready(function () {
               /*** overall table data ***/
               chart.data = data;
               // click event
-              $('#overall-overallTable tbody').on('click', 'tr', function () {
-                  var data = $('#overall-overallTable').DataTable().row( this ).data();
+              $('#overall-overallTable tbody').on('click', 'tr', function (e) {
+                var radioValue = $("input[name='table']:checked").val();
+                var data = $('#overall-overallTable').DataTable().row( this ).data();
+                console.log(radioValue);
+                if (radioValue == "1"){
                   moveCursor (chart, data[0]);
-              } );
+                } else {
+                  $("#gradeModal").modal("show");
+                  e.stopPropagation();
+                  $('#specialHandleApplyBtn').one('click', function(e) {
+                      //alert('clicked');
+                      var specialHandleValue = $("input[name='specialHandle']:checked").val();
+                        for (let i = 0; i < chart.data.length; i++) {
+                          if(chart.data[i].sid==data[0]){
+                            chart.data[i].grade = specialHandleValue;
+                            console.log("chart data of "+data[0]+" is set to "+specialHandleValue);
+
+                          }
+                        }
+                        console.log(chart.data);
+                        //update table
+                        for (let i = 0; i < chart.data.length; i++) {
+                          $('#overall-overallTable').DataTable().rows().every( function () {
+                              var row = this.data();
+
+                              if (row[0]==chart.data[i].sid){
+                                row[2] = chart.data[i].grade;
+                              }
+                              this.invalidate();
+                          } );
+                        }
+                        $('#overall-overallTable').DataTable().draw();
+                  });
+                  // $('#specialHandleApplyBtn').click(function () {
+                  //   var specialHandleValue = $("input[name='specialHandle']:checked").val();
+                  //   for (let i = 0; i < chart.data.length; i++) {
+                  //     if(chart.data[i].sid==data[0]){
+                  //       chart.data[i].grade = specialHandleValue;
+                  //       console.log("chart data of "+data[0]+" is set to "+specialHandleValue);
+                  //     }
+                  //   }
+                  //   // update table
+                  //   $('#overall-overallTable').DataTable().rows().every( function () {
+                  //       var row = this.data();
+                  //
+                  //       if (row[0]==data[0]){
+                  //         row[2] = chart.data[i].grade;
+                  //       }
+                  //       this.invalidate();
+                  //   } );
+                  //   $('#overall-overallTable').DataTable().draw();
+                  //   $('#gradeModal').modal('hide')
+                  //   //setGrade (chart, gradeRange);
+                  // })
+
+                //   $('.gradeBtn').one('click', function () {
+                //     for (let i = 0; i < chart.data.length; i++) {
+                //       if(chart.data[i].sid==data[0]){
+                //         chart.data[i].grade = $(this).html();
+                //         console.log("chart data of "+data[0]+" is set to "+$(this).html());
+                //       }
+                //     }
+                //     // update table
+                //     $('#overall-overallTable').DataTable().rows().every( function () {
+                //         var row = this.data();
+                //
+                //         if (row[0]==data[0]){
+                //           row[2] = chart.data[i].grade;
+                //         }
+                //         this.invalidate();
+                //     } );
+                //     $('#overall-overallTable').DataTable().draw();
+                //     $('#gradeModal').modal('hide')
+                // })
+                }
+              });
+
+
 
               /*** weighting table data ***/
               weightingChart.data = calculateWeightChartData(inputWeighting, inputFields);
@@ -415,6 +489,10 @@ $(document).ready(function () {
     //console.log(gradeRange);
     setGrade (chart, gradeRange);
   })
+
+
+
+
 
   // $('#overall-overallTable tbody').click(function (e){
   //   //moveCursor (chart, e.target.innerHTML)
@@ -1077,7 +1155,6 @@ function setGrade (chart, gradeRange) {
     }
   }
   // update table
-  let infoTable = [];
   for (let i = 0; i < chart.data.length; i++) {
     $('#overall-overallTable').DataTable().rows().every( function () {
         var row = this.data();

@@ -442,6 +442,8 @@ $(document).ready(function () {
   $('#binSlider').change(function () {
     var value = $('#binSlider').val();
     $('#binSize').text(value);
+    setHistChartData (value);
+    histChart.validateData();
   });
 
   $('#showOverallChartBtn').click(function () {
@@ -471,11 +473,11 @@ $(document).ready(function () {
     $('#binOption').css('display', 'none')
   })
 
-  $('#changeBinSizeBtn').click(function () {
-    var value = $('#binSlider').val();
-    setHistChartData (value);
-    histChart.validateData();
-  })
+  // $('#changeBinSizeBtn').click(function () {
+  //   var value = $('#binSlider').val();
+  //   setHistChartData (value);
+  //   histChart.validateData();
+  // })
 
   $('#gradeClearBtn').click(function () {
     //xAxis.axisRanges.clear();

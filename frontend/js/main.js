@@ -30,9 +30,7 @@ $(document).ready(function () {
     }).done(function (data) {
       $('#filename').text(data.inputname)
       $('#filename').val(data.filename)
-      $('#topHeader').css('display', 'none')
-      $('#about').css('display', 'none')
-      $('#fileSubmitDiv').css('display', 'block')
+
       $.ajax({
         url: 'http://localhost:3000/getfile/' + $('#filename').val(),
         type: 'GET',
@@ -63,33 +61,39 @@ $(document).ready(function () {
           if (isRepeatSid) {
             alert('There are repeated student ID! Please check your CSV file');
           } else {
+            console.log('no repeat');
 
+            $('#topHeader').css('display', 'none')
+            $('#about').css('display', 'none')
+            $('#fileSubmitDiv').css('display', 'block')
+
+            var settingTableEl = []
+            for (let i in Object.keys(res[0])) {
+              let settingTableRow = `<tr>
+                <th scope="row">${Object.keys(res[0])[i]}</th>
+                <td class="">
+                  <select class="form-control columnTypeSelect" onchange="selectOnchange(this)">
+                    <option value="ignore">Ignore</option>
+                    <option value="sid">Student ID</option>
+                    <option value="assignment">Assignment</option>
+                    <option value="quiz">Quiz/Test</option>
+                    <option value="midterm">Midterm</option>
+                    <option value="proj">Project</option>
+                    <option value="final">Final</option>
+                    <option value="overall">Overall</option>
+                  </select>
+                </td>
+                <td>
+                  <input class="form-control" id="weighting-${i}" disabled="true" type="number" min="1" max="100">
+                </td>
+              </tr>`
+              settingTableEl.push(settingTableRow);
+            }
+            $('#settingTable tbody').html(settingTableEl);
+            suggestSetting();
           }
 
-          var settingTableEl = []
-          for (let i in Object.keys(res[0])) {
-            let settingTableRow = `<tr>
-              <th scope="row">${Object.keys(res[0])[i]}</th>
-              <td class="">
-                <select class="form-control columnTypeSelect" onchange="selectOnchange(this)">
-                  <option value="ignore">Ignore</option>
-                  <option value="sid">Student ID</option>
-                  <option value="assignment">Assignment</option>
-                  <option value="quiz">Quiz/Test</option>
-                  <option value="midterm">Midterm</option>
-                  <option value="proj">Project</option>
-                  <option value="final">Final</option>
-                  <option value="overall">Overall</option>
-                </select>
-              </td>
-              <td>
-                <input class="form-control" id="weighting-${i}" disabled="true" type="number" min="1" max="100">
-              </td>
-            </tr>`
-            settingTableEl.push(settingTableRow);
-          }
-          $('#settingTable tbody').html(settingTableEl);
-          suggestSetting();
+
         });
     })
   })

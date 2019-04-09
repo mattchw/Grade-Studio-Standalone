@@ -102,17 +102,6 @@ $(document).ready(function () {
               outputData = calculateWeightedScore(res, inputWeighting, inputFields);
               console.log(outputData);
 
-              // var chartData = new Object();
-              // var jsonData = {};
-              // $('table#settingTable tr th').each(function () {
-              //   jsonData[$(this).text]
-              // });
-              // columnsResult.forEach(function(column) {
-              //     var columnName = column.metadata.colName;
-              //     jsonData[columnName] = column.value;
-              // });
-              // viewData.employees.push(jsonData);
-
               /*** create tab content ***/
               var tabItems = []
               $('#settingTable tbody tr').each(function (key, item) {
@@ -267,102 +256,103 @@ $(document).ready(function () {
                 new_data.score = outputData[i].score;
                 new_data.value = NormalDensityZx(scores[i], mean, stdDev);
                 new_data.grade = '';
+                new_data.remark = '';
                 data.push(new_data);
 
+                overallData.push(outputData[i].sid);
                 overallData.push(outputData[i].sid);
                 overallData.push(outputData[i].score.toFixed(2));
                 overallData.push('');
                 overallDataSet.push(overallData);
               }
               $('#overall-overallTable').DataTable({
-                  data: overallDataSet,
+                  data: data,
                   columns: [
-                      { title: "SID" },
-                      { title: "Score" },
-                      { title: "Grade" }
-                  ]
+                    {
+                      "className":      'up-control',
+                      "width":          "20px",
+                      "orderable":      false,
+                      "data":           null,
+                      "defaultContent": ''
+                    },
+                    {
+                      "className":      'special-control',
+                      "width":          "20px",
+                      "orderable":      false,
+                      "data":           null,
+                      "defaultContent": ''
+                    },{
+                      "className":      'details-control',
+                      "width":          "20px",
+                      "orderable":      false,
+                      "data":           null,
+                      "defaultContent": ''
+                    },
+                      { title: "SID", data: "sid" },
+                      { title: "Score", data: "score" },
+                      { title: "Grade", data: "grade" }
+                  ],
+                  "order": [[3, 'asc']]
               });
               console.log(data);
               /*** overall table data ***/
               chart.data = data;
-              // click event
-              $('#overall-overallTable tbody').on('click', 'tr', function (e) {
-                var radioValue = $("input[name='table']:checked").val();
-                var data = $('#overall-overallTable').DataTable().row( this ).data();
-                console.log(radioValue);
-                if (radioValue == "1"){
-                  moveCursor (chart, data[0]);
-                } else {
-                  $("#gradeModal").modal("show");
-                  e.stopPropagation();
-                  $('#specialHandleApplyBtn').one('click', function(e) {
-                      //alert('clicked');
-                      var specialHandleValue = $("input[name='specialHandle']:checked").val();
-                        for (let i = 0; i < chart.data.length; i++) {
-                          if(chart.data[i].sid==data[0]){
-                            chart.data[i].grade = specialHandleValue;
-                            console.log("chart data of "+data[0]+" is set to "+specialHandleValue);
 
+              $('#overall-overallTable tbody').on('click', 'td.up-control', function () {
+                var data = $('#overall-overallTable').DataTable().cell( this ).data();
+                console.log(data);
+                moveCursor (chart, data.sid);
+              } );
+
+              $('#overall-overallTable tbody').on('click', 'td.special-control', function () {
+                $("#gradeModal").modal("show");
+                var target = $('#overall-overallTable').DataTable().cell( this ).data();
+                console.log(target);
+                    // e.stopPropagation();
+                    $('#specialHandleApplyBtn').one('click', function(e) {
+                      var text = $("#remarkText").val();
+                      console.log(text);
+                        //alert('clicked');
+                        var specialHandleValue = $("input[name='specialHandle']:checked").val();
+                          for (let i = 0; i < chart.data.length; i++) {
+                            if(chart.data[i].sid==target.sid){
+                              chart.data[i].grade = specialHandleValue;
+                              chart.data[i].remark = text;
+                              console.log("chart data of "+target.sid+" is set to "+specialHandleValue);
+                            }
                           }
-                        }
-                        console.log(chart.data);
-                        //update table
-                        for (let i = 0; i < chart.data.length; i++) {
-                          $('#overall-overallTable').DataTable().rows().every( function () {
-                              var row = this.data();
+                          //console.log(chart.data);
+                          //update table
+                          for (let i = 0; i < chart.data.length; i++) {
+                            $('#overall-overallTable').DataTable().rows().every( function () {
+                                var row = this.data();
 
-                              if (row[0]==chart.data[i].sid){
-                                row[2] = chart.data[i].grade;
-                              }
-                              this.invalidate();
-                          } );
-                        }
-                        $('#overall-overallTable').DataTable().draw();
-                  });
-                  // $('#specialHandleApplyBtn').click(function () {
-                  //   var specialHandleValue = $("input[name='specialHandle']:checked").val();
-                  //   for (let i = 0; i < chart.data.length; i++) {
-                  //     if(chart.data[i].sid==data[0]){
-                  //       chart.data[i].grade = specialHandleValue;
-                  //       console.log("chart data of "+data[0]+" is set to "+specialHandleValue);
-                  //     }
-                  //   }
-                  //   // update table
-                  //   $('#overall-overallTable').DataTable().rows().every( function () {
-                  //       var row = this.data();
-                  //
-                  //       if (row[0]==data[0]){
-                  //         row[2] = chart.data[i].grade;
-                  //       }
-                  //       this.invalidate();
-                  //   } );
-                  //   $('#overall-overallTable').DataTable().draw();
-                  //   $('#gradeModal').modal('hide')
-                  //   //setGrade (chart, gradeRange);
-                  // })
+                                if (row[0]==chart.data[i].sid){
+                                  row[2] = chart.data[i].grade+"*";
+                                }
+                                this.invalidate();
+                            } );
+                          }
+                          $('#overall-overallTable').DataTable().draw();
+                    });
+              } );
 
-                //   $('.gradeBtn').one('click', function () {
-                //     for (let i = 0; i < chart.data.length; i++) {
-                //       if(chart.data[i].sid==data[0]){
-                //         chart.data[i].grade = $(this).html();
-                //         console.log("chart data of "+data[0]+" is set to "+$(this).html());
-                //       }
-                //     }
-                //     // update table
-                //     $('#overall-overallTable').DataTable().rows().every( function () {
-                //         var row = this.data();
-                //
-                //         if (row[0]==data[0]){
-                //           row[2] = chart.data[i].grade;
-                //         }
-                //         this.invalidate();
-                //     } );
-                //     $('#overall-overallTable').DataTable().draw();
-                //     $('#gradeModal').modal('hide')
-                // })
-                }
-              });
+              // Add event listener for opening and closing details
+              $('#overall-overallTable tbody').on('click', 'td.details-control', function () {
+                  var tr = $(this).closest('tr');
+                  var row = $('#overall-overallTable').DataTable().row( tr );
 
+                  if ( row.child.isShown() ) {
+                      // This row is already open - close it
+                      row.child.hide();
+                      tr.removeClass('shown');
+                  }
+                  else {
+                      // Open this row
+                      row.child( format(row.data()) ).show();
+                      tr.addClass('shown');
+                  }
+              } );
 
 
               /*** weighting table data ***/
@@ -392,42 +382,7 @@ $(document).ready(function () {
               }
               $('#changeSettingTable tbody').html(changeSettingEl);
 
-
-              // let histMax = Math.ceil(max/5)*5;
-              // let histMin = Math.floor(min/5)*5;
-              // console.log("max: "+histMax+" min: "+histMin);
-              // let binNum = 10;
-              // let binSize = (histMax - histMin)/binNum;
-              // console.log("bin size: "+binSize)
-              //
-              // let histData = [];
-              // for (let i = 0; i < binNum; i++){
-              //   var new_data = {};
-              //   new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
-              //   new_data.frequency = 0;
-              //   histData.push(new_data);
-              // }
-              //
-              // for (let i = 0; i < outputData.length; i++) {
-              //   for (let j = 0; j < binNum; j++){
-              //     let minBoundary = parseFloat(histData[j].boundary)
-              //     if (j!=binNum-1) {
-              //       let maxBoundary = parseFloat(histData[j+1].boundary)
-              //       if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
-              //         histData[j].frequency = histData[j].frequency+1;
-              //         break;
-              //       }
-              //     } else {
-              //       if (outputData[i].score>=minBoundary) {
-              //         histData[j].frequency = histData[j].frequency+1;
-              //         break;
-              //       }
-              //     }
-              //   }
-              // }
-
               // /*** histogram data ***/
-              // histChart.data = histData
               setHistChartData (10);
 
               initChart();
@@ -471,12 +426,6 @@ $(document).ready(function () {
     $('#binOption').css('display', 'none')
   })
 
-  // $('#changeBinSizeBtn').click(function () {
-  //   var value = $('#binSlider').val();
-  //   setHistChartData (value);
-  //   histChart.validateData();
-  // })
-
   $('#gradeClearBtn').click(function () {
     //xAxis.axisRanges.clear();
     for (var i in gradeRange){
@@ -489,24 +438,6 @@ $(document).ready(function () {
     //console.log(gradeRange);
     setGrade (chart, gradeRange);
   })
-
-
-
-
-
-  // $('#overall-overallTable tbody').click(function (e){
-  //   //moveCursor (chart, e.target.innerHTML)
-  //   alert( 'You clicked on row' );
-  // })
-
-//   $( document ).on("click", " tobody tr[role='row']", function(){
-//     alert($(this).children('td:first-child').text())
-// });
-
-  // $('#overall-overallTable tbody').on('click', 'tr', function () {
-  //   var data = table.row( this ).data();
-  //   alert( 'You clicked on '+data[0]+'\'s row' );
-  // });
 
   $('#changeWeightingBtn').click(function () {
     $.ajax({
@@ -542,6 +473,7 @@ $(document).ready(function () {
         new_data.score = outputData[i].score;
         new_data.value = NormalDensityZx(scores[i], mean, stdDev);
         new_data.grade = '';
+        new_data.remark = '';
         data.push(new_data);
 
         overallData.push(outputData[i].sid);
@@ -554,12 +486,33 @@ $(document).ready(function () {
       overallDataTable.destroy(); // destroy the original datatable before reinitializing
 
       overallDataTable = $('#overall-overallTable').DataTable({
-          data: overallDataSet,
+          data: data,
           columns: [
-              { title: "SID" },
-              { title: "Score" },
-              { title: "Grade" }
-          ]
+            {
+              "className":      'up-control',
+              "width":          "20px",
+              "orderable":      false,
+              "data":           null,
+              "defaultContent": ''
+            },
+            {
+              "className":      'special-control',
+              "width":          "20px",
+              "orderable":      false,
+              "data":           null,
+              "defaultContent": ''
+            },{
+              "className":      'details-control',
+              "width":          "20px",
+              "orderable":      false,
+              "data":           null,
+              "defaultContent": ''
+            },
+              { title: "SID", data: "sid" },
+              { title: "Score", data: "score" },
+              { title: "Grade", data: "grade" }
+          ],
+          "order": [[3, 'asc']]
       });
 
       /*** update (bell curve) chart  ***/
@@ -985,6 +938,17 @@ function alertRefresh () {
 //   document.body.scrollTop = 0;
 //   document.documentElement.scrollTop = 0;
 // }
+
+/*** DataTable Functions ***/
+function format ( d ) {
+    // `d` is the original data object for the row
+    return '<table class="table table-hover">'+
+        '<tr>'+
+            '<td>Remark</td>'+
+            '<td>'+d.remark+'</td>'+
+        '</tr>'+
+    '</table>';
+}
 
 /*** Statistics Function ***/
 function calculateMeanScore (scores) {

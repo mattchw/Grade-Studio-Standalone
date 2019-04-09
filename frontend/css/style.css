@@ -25,6 +25,28 @@ section { height: 100vh; }
 .bg-primary {
     background-color: #2b2b2b!important;
 }
+
+td.up-control {
+    background: url('../image/up.png') no-repeat center center;
+    background-size: 20px 20px;
+    cursor: pointer;
+}
+
+td.special-control {
+    background: url('../image/special.png') no-repeat center center;
+    background-size: 20px 20px;
+    cursor: pointer;
+}
+
+td.details-control {
+    background: url('../image/details_open.png') no-repeat center center;
+    cursor: pointer;
+}
+
+tr.shown td.details-control {
+    background: url('../image/details_close.png') no-repeat center center;
+}
+
 #disclaimer {
   background: lightgray;
   width: 100%;

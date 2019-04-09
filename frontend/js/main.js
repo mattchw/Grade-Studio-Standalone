@@ -80,6 +80,34 @@ $(document).ready(function () {
           contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
           processData: false // NEEDED, DON'T OMIT THIS
         }).done(function (res) {
+            // basic checking of csv
+            var isRepeatSid = false;
+            var isNegativeScore = false;
+
+            // check repeat student
+            for (let i = 0; i < res.length; i++) {
+              for (let j = i + 1; j < res.length; j++) {
+                if (typeof res[i].sid !== 'undefined') {
+                  if (res[i].sid === res[j].sid) {
+                    isRepeatSid = true;
+                  }
+                } else if (typeof res[i].student !== 'undefined') {
+                  if (res[i].student === res[j].student) {
+                    isRepeatSid = true;
+                  }
+                }
+              }
+            }
+
+            console.log(isRepeatSid);
+
+            if (isRepeatSid) {
+              alert('There are repeated student ID! Please check your CSV file');
+            } else {
+
+            }
+
+
             var tableWeighting = 0;
             $('table#settingTable tr input').each(function () {
               if (isNaN(parseInt($(this).val())) === false) {
@@ -389,6 +417,8 @@ $(document).ready(function () {
               initWeightingChart();
               initHistChart();
             }
+
+
           });
   })
 

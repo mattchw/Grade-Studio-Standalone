@@ -16,6 +16,8 @@ $(document).ready(function () {
   var upperQ = -1;
   var lowerQ = -1;
 
+  var needAreaSuggestion = false;
+
   $('#binSize').text($('#binSlider').val());
 
   $('#uploadBtn').click(function () {
@@ -581,21 +583,21 @@ $(document).ready(function () {
     meanRange.label.text = "Mean";
     meanRange.label.fill = meanRange.grid.stroke;
 
-    var leftSdRange = xAxis.axisRanges.create();
-    leftSdRange.value = mean-stdDev;
-    leftSdRange.grid.stroke = am4core.color("#396478");
-    leftSdRange.grid.strokeWidth = 2;
-    leftSdRange.grid.strokeOpacity = 1;
-    leftSdRange.label.text = "μ-σ";
-    leftSdRange.label.fill = leftSdRange.grid.stroke;
-
-    var rightSdRange = xAxis.axisRanges.create();
-    rightSdRange.value = mean+stdDev;
-    rightSdRange.grid.stroke = am4core.color("#396478");
-    rightSdRange.grid.strokeWidth = 2;
-    rightSdRange.grid.strokeOpacity = 1;
-    rightSdRange.label.text = "μ+σ";
-    rightSdRange.label.fill = rightSdRange.grid.stroke;
+    // var leftSdRange = xAxis.axisRanges.create();
+    // leftSdRange.value = mean-stdDev;
+    // leftSdRange.grid.stroke = am4core.color("#396478");
+    // leftSdRange.grid.strokeWidth = 2;
+    // leftSdRange.grid.strokeOpacity = 1;
+    // leftSdRange.label.text = "μ-σ";
+    // leftSdRange.label.fill = leftSdRange.grid.stroke;
+    //
+    // var rightSdRange = xAxis.axisRanges.create();
+    // rightSdRange.value = mean+stdDev;
+    // rightSdRange.grid.stroke = am4core.color("#396478");
+    // rightSdRange.grid.strokeWidth = 2;
+    // rightSdRange.grid.strokeOpacity = 1;
+    // rightSdRange.label.text = "μ+σ";
+    // rightSdRange.label.fill = rightSdRange.grid.stroke;
 
     var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
     yAxis.dataFields.value = 'value';
@@ -614,62 +616,7 @@ $(document).ready(function () {
     square.width = 5;
     square.height = 5;
 
-    let gradeCutOff = [];
-    let MaxMinProb = probabilityBetween(max, min, mean, stdDev);
-    let cumulativeProb = 0;
-    for (var grade in CUHKgradePercentage){
-      console.log(grade);
-      console.log(CUHKgradePercentage[grade]);
-      let percent = CUHKgradePercentage[grade];
-      if (MaxMinProb<1){
-        percent = percent*MaxMinProb;
-      }
-      if (percent>0){
-        if (gradeCutOff.length == 0){
-          var mark = max;
-          while(true){
-            let prob = probabilityBetween(max, mark, mean, stdDev);
-            if (prob > percent){
-              console.log(prob);
-              cumulativeProb+=prob;
-              insertArea (chart, am4core, gradeRange, grade, chart.xAxes.getIndex(0), series, mark, max);
-              break;
-            }
-            else {
-              mark-=0.1;
-            }
-          }
-          gradeCutOff.push(mark);
-          console.log(gradeCutOff);
-          console.log("Cumulative percent: "+cumulativeProb+" "+MaxMinProb);
-        }
-        else {
-          var lastCutOff = gradeCutOff[gradeCutOff.length-1];
-          var mark = lastCutOff;
-          while(true){
-            //console.log("Inside loop");
-            let prob = probabilityBetween(lastCutOff, mark, mean, stdDev);
-            //console.log("Probability between "+lastCutOff+" and "+mark+" is "+prob);
-            if (prob > percent){
-              //console.log(prob);
-              cumulativeProb+=prob;
-              insertArea (chart, am4core, gradeRange, grade, chart.xAxes.getIndex(0), series, mark, lastCutOff);
-              break;
-            } else if (mark<min){
-              insertArea (chart, am4core, gradeRange, grade, chart.xAxes.getIndex(0), series, min, lastCutOff);
-              break;
-            }
-            else {
-              mark-=0.1;
-            }
-          }
-          gradeCutOff.push(mark);
-          console.log(gradeCutOff);
-          console.log("Cumulative percent: "+cumulativeProb+" "+MaxMinProb);
-        }
-      }
-    }
-    console.log(chart.data);
+    suggestArea (chart, am4core, gradeRange, series, outputData, max, min);
 
     chart.cursor = new am4charts.XYCursor();
     chart.cursor.lineX.stroke = am4core.color("#006eff");
@@ -1144,21 +1091,29 @@ const zTable = {
 }
 const CUHKgradePercentage = {
   "A": 0.1,
-  "A-": 0.1,
-  "B+": 0.1,
-  "B": 0.1,
-  "B-": 0.1,
-  "C+": 0.1,
-  "C": 0.1,
-  "C-": 0.1,
-  "D+": 0.1,
-  "D": 0.1,
-  "F": 0
+  "A-": 0.3,
+  "B-": 0.6,
+  "C-": 0.9,
+  "D": 1
 }
 function round(value, decimalPlaces){
   const factor = Math.pow(10, decimalPlaces);
   return Math.round(value * factor) / factor;
 };
+function percentile(arr, p) {
+    if (arr.length === 0) return 0;
+    if (typeof p !== 'number') throw new TypeError('p must be a number');
+    if (p <= 0) return arr[0];
+    if (p >= 1) return arr[arr.length - 1];
+
+    var index = arr.length * p,
+        lower = Math.floor(index),
+        upper = lower + 1,
+        weight = index % 1;
+
+    if (upper >= arr.length) return arr[lower];
+    return arr[lower] * (1 - weight) + arr[upper] * weight;
+}
 
 /*** Chart Function ***/
 function selectColor (label) {
@@ -1250,6 +1205,65 @@ function updateAreaRatio (gradeRange, scores) {
     })
     var num = count
     $('#gradeTable #'+gradeRange[i].label.text).html(num);
+  }
+}
+function suggestArea (chart, am4core, gradeRange, series, outputData, max, min) {
+  let gradeCutOff = [];
+  //let MaxMinProb = probabilityBetween(max, min, mean, stdDev);
+  console.log(outputData);
+  var scoreArr = [];
+  var distArr = [];
+  for (var i = outputData.length-1;i>=0;i--){
+    scoreArr.push(outputData[i].score);
+    if((i-1)>=0){
+      distArr.push((outputData[i].score-outputData[i-1].score));
+    }
+  }
+  console.log(scoreArr);
+  console.log(distArr);
+  var total = 0;
+  for (var i = 0;i<distArr.length;i++){
+    total += distArr[i];
+  }
+  console.log("average dist: "+(total / distArr.length));
+  var gradeArr = [];
+  var tmpCum = [];
+  for (var grade in CUHKgradePercentage){
+    console.log(grade);
+    gradeArr.push(grade);
+    console.log(CUHKgradePercentage[grade]);
+    tmpCum.push(CUHKgradePercentage[grade]);
+    console.log(percentile(scoreArr,CUHKgradePercentage[grade]))
+    gradeCutOff.push(percentile(scoreArr,CUHKgradePercentage[grade]));
+  }
+  // for (var i =0;i<tmpCum.length;i++){
+  //   if(i==0){
+  //     tmpCum[i]=tmpCum[i]/2;
+  //   } else if (i==tmpCum.length-1){
+  //     tmpCum[i]=tmpCum[i];
+  //   } else {
+  //     tmpCum[i]=(tmpCum[i]+tmpCum[i-1])/2;
+  //   }
+  // }
+  // console.log(tmpCum);
+  // console.log(gradeArr);
+  // console.log(gradeCutOff);
+  // for (var i = 0;i<tmpCum.length;i++){
+  //   console.log(gradeArr[i]);
+  //   console.log(tmpCum[i]);
+  //   console.log(percentile(scoreArr,tmpCum[i]));
+  //   gradeCutOff.push(percentile(scoreArr,tmpCum[i]));
+  // }
+  for(var i=0;i<gradeCutOff.length;i++){
+    console.log(gradeArr[i])
+    if(i==0){
+      insertArea (chart, am4core, gradeRange, gradeArr[i], chart.xAxes.getIndex(0), series, gradeCutOff[i], max);
+    } else if (i==gradeCutOff.length-1){
+      insertArea (chart, am4core, gradeRange, gradeArr[i], chart.xAxes.getIndex(0), series, min, gradeCutOff[i-1]);
+    } else {
+      insertArea (chart, am4core, gradeRange, gradeArr[i], chart.xAxes.getIndex(0), series, gradeCutOff[i], gradeCutOff[i-1]);
+    }
+    updateAreaRatio(gradeRange,scoreArr);
   }
 }
 

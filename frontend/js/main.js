@@ -16,8 +16,6 @@ $(document).ready(function () {
   var upperQ = -1;
   var lowerQ = -1;
 
-  var needAreaSuggestion = false;
-
   $('#binSize').text($('#binSlider').val());
 
   $('#uploadBtn').click(function () {
@@ -649,7 +647,10 @@ $(document).ready(function () {
     square.width = 5;
     square.height = 5;
 
-    suggestArea (chart, am4core, gradeRange, series, outputData, max, min);
+    if ($('#suggestionCheck').is(":checked")) {
+      console.log("it is checked")
+      suggestArea (chart, am4core, gradeRange, series, outputData, max, min);
+    }
 
     chart.cursor = new am4charts.XYCursor();
     chart.cursor.lineX.stroke = am4core.color("#006eff");

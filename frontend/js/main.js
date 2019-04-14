@@ -32,39 +32,70 @@ $(document).ready(function () {
     }).done(function (data) {
       $('#filename').text(data.inputname)
       $('#filename').val(data.filename)
-      $('#topHeader').css('display', 'none')
-      $('#about').css('display', 'none')
-      $('#fileSubmitDiv').css('display', 'block')
+
       $.ajax({
         url: 'http://localhost:3000/getfile/' + $('#filename').val(),
         type: 'GET',
         contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
         processData: false // NEEDED, DON'T OMIT THIS
       }).done(function (res) {
-          var settingTableEl = []
-          for (let i in Object.keys(res[0])) {
-            let settingTableRow = `<tr>
-              <th scope="row">${Object.keys(res[0])[i]}</th>
-              <td class="">
-                <select class="form-control columnTypeSelect" onchange="selectOnchange(this)">
-                  <option value="ignore">Ignore</option>
-                  <option value="sid">Student ID</option>
-                  <option value="assignment">Assignment</option>
-                  <option value="quiz">Quiz/Test</option>
-                  <option value="midterm">Midterm</option>
-                  <option value="proj">Project</option>
-                  <option value="final">Final</option>
-                  <option value="overall">Overall</option>
-                </select>
-              </td>
-              <td>
-                <input class="form-control" id="weighting-${i}" disabled="true" type="number" min="1" max="100">
-              </td>
-            </tr>`
-            settingTableEl.push(settingTableRow);
+          // basic checking of csv
+          var isRepeatSid = false;
+          var isNegativeScore = false;
+
+          // check repeat student
+          for (let i = 0; i < res.length; i++) {
+            for (let j = i + 1; j < res.length; j++) {
+              if (typeof res[i].sid !== 'undefined') {
+                if (res[i].sid === res[j].sid) {
+                  isRepeatSid = true;
+                }
+              } else if (typeof res[i].student !== 'undefined') {
+                if (res[i].student === res[j].student) {
+                  isRepeatSid = true;
+                }
+              }
+            }
           }
-          $('#settingTable tbody').html(settingTableEl);
-          suggestSetting();
+
+          console.log(isRepeatSid);
+
+          if (isRepeatSid) {
+            alert('There are repeated student ID! Please check your CSV file');
+          } else {
+            console.log('no repeat');
+
+            $('#topHeader').css('display', 'none')
+            $('#about').css('display', 'none')
+            $('#fileSubmitDiv').css('display', 'block')
+
+            var settingTableEl = []
+            for (let i in Object.keys(res[0])) {
+              let settingTableRow = `<tr>
+                <th scope="row">${Object.keys(res[0])[i]}</th>
+                <td class="">
+                  <select class="form-control columnTypeSelect" onchange="selectOnchange(this)">
+                    <option value="ignore">Ignore</option>
+                    <option value="sid">Student ID</option>
+                    <option value="assignment">Assignment</option>
+                    <option value="quiz">Quiz/Test</option>
+                    <option value="midterm">Midterm</option>
+                    <option value="proj">Project</option>
+                    <option value="final">Final</option>
+                    <option value="overall">Overall</option>
+                  </select>
+                </td>
+                <td>
+                  <input class="form-control" id="weighting-${i}" disabled="true" type="number" min="1" max="100">
+                </td>
+              </tr>`
+              settingTableEl.push(settingTableRow);
+            }
+            $('#settingTable tbody').html(settingTableEl);
+            suggestSetting();
+          }
+
+
         });
     })
   })
@@ -391,6 +422,8 @@ $(document).ready(function () {
               initWeightingChart();
               initHistChart();
             }
+
+
           });
   })
 

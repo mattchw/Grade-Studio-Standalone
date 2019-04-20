@@ -3,7 +3,11 @@ html, body {
   margin: 0px;
 }
 
-section { height: 100vh; }
+section { height: 100vh;}
+
+/* .row {
+  background-color: white;
+} */
 
 .header {
     display: table;
@@ -55,10 +59,14 @@ tr.shown td.details-control {
 }
 
 #fileUploadDiv {
-  height: 92%;
+  /* height: 92%; */
 }
 
 #fileSubmitDiv {
+  display: none;
+}
+
+#suggestTable {
   display: none;
 }
 

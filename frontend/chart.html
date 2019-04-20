@@ -33,11 +33,11 @@
         <div class="text-vertical-center">
             <h1>Grade Studio</h1>
             <br>
-            <a href="#about" class="btn btn-dark btn-lg">Get Started</a>
+            <a href="#start" class="btn btn-dark btn-lg">Get Started</a>
         </div>
     </header>
 
-    <section id="about">
+    <section id="start">
       <div id="fileUploadDiv" class="container-fluid bg-light">
         <div class="p-3">
           <!-- <div id="disclaimer">
@@ -55,14 +55,51 @@ This message is sent to you because your email address is on our subscribers lis
 Thank you for subscribing to our newsletter. [Your company name] team will work hard to deliver good quality information in the fields you have specified upon subscription. However, if you decide that you no longer want to receive such emails from us, feel free to click the link below. Click here to unsubscribe.
           </div> -->
           <div class="row">
-            <h1 class="mx-auto">Please upload your CSV file</h1>
+            <div class="col-lg-12 text-center">
+                    <h2>About Grade Studio</h2>
+                    <p class="lead">
+                      Grade Studio is a students’ performance analyzing web app tailor-made for teachers at universities in Hong Kong.
+                      <br>
+                        <br>
+                        There are four features in Grade Studio:<br>
+                        <br>
+                        <h4>1. Gaussian distribution curve</h4>
+                        <br>
+  i. Showing the overall performace of the students<br>
+  ii. Users can select the areas on the curve to assign grades to students<br><br>
+                        <h4>2. Histogram</h4>
+                        <br>
+  i. Showing the frequency distribution of the overall score<br>
+  ii. Users can manually change the bin size from 1 - 10<br><br>
+  <h4>3. Weighting chart</h4>
+  <br>
+  i. Showing a pie chart and table based on the weighting set in the weight-setting module<br>
+  ii. Users can change the weighting on the fly and the data will be updated<br><br>
+  <h4>4. Student performance table</h4>
+  <br>
+  i. A table showing the score and grade of students<br>
+  ii. Users can give remark to students
+                      <br>
+                      <br>
+                      By uploading your csv file, you hereby consent to our disclaimer and agree to its terms.
+                      <br>
+                    </p>
+                </div>
           </div>
-          <div class="row custom-file">
-            <!-- <form id="sendFile" method="post" action="http://localhost:3000/uploadfile" encType="multipart/form-data"> -->
-            <form id="sendFile" encType="multipart/form-data">
-              <input type="file" class="form-control-file" name="importfile" accept=".csv">
-            </form>
-            <button class="btn btn-primary mt-2" id="uploadBtn">Upload</button>
+          <div class="row">
+            <!-- <h3 >Please upload your CSV file</h3> -->
+            <div class="card col-lg-12 text-center" style="width: 50rem;">
+              <div class="card-body">
+                <h3 >Please upload your CSV file</h3>
+                <div class="row custom-file">
+                  <!-- <form id="sendFile" method="post" action="http://localhost:3000/uploadfile" encType="multipart/form-data"> -->
+                  <form id="sendFile" encType="multipart/form-data">
+                    <input type="file" class="form-control-file" name="importfile" accept=".csv">
+                  </form>
+                  <button class="btn btn-primary mt-2" id="uploadBtn">Upload</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -91,6 +128,77 @@ Thank you for subscribing to our newsletter. [Your company name] team will work 
             <input type="checkbox" class="form-check-input" id="suggestionCheck">
             <label class="form-check-label" for="exampleCheck1">Need Area Suggestion?</label>
           </div>
+          <table class="table" id="suggestTable">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Grade</th>
+                <th scope="col">Cumulative (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">A</th>
+                <td>
+                  <input class="form-control" id="cumulative-A" type="number" min="1" max="100">
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">A-</th>
+                <td>
+                  <input class="form-control" id="cumulative-A-" type="number" min="1" max="100">
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">B+</th>
+                <td>
+                  <input class="form-control" id="cumulative-B+" type="number" min="1" max="100">
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">B</th>
+                <td>
+                  <input class="form-control" id="cumulative-B" type="number" min="1" max="100">
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">B-</th>
+                <td>
+                  <input class="form-control" id="cumulative-B-" type="number" min="1" max="100">
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">C+</th>
+                <td>
+                  <input class="form-control" id="cumulative-C+" type="number" min="1" max="100">
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">C</th>
+                <td>
+                  <input class="form-control" id="cumulative-C" type="number" min="1" max="100">
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">C-</th>
+                <td>
+                  <input class="form-control" id="cumulative-C-" type="number" min="1" max="100">
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">D+</th>
+                <td>
+                  <input class="form-control" id="cumulative-D+" type="number" min="1" max="100">
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">D</th>
+                <td>
+                  <input class="form-control" id="cumulative-D" type="number" min="1" max="100">
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
         </div>
         <div class="row">
           <button class="btn btn-primary mt-2" id="submitBtn">Submit</button>
@@ -168,6 +276,7 @@ Thank you for subscribing to our newsletter. [Your company name] team will work 
         <table class="table" id="gradeTable">
           <thead class="thead-dark">
             <tr>
+              <th scope="col"></th>
               <th scope="col">F</th>
               <th scope="col">D-</th>
               <th scope="col">D</th>
@@ -185,6 +294,7 @@ Thank you for subscribing to our newsletter. [Your company name] team will work 
           </thead>
           <tbody>
             <tr>
+              <th scope="row">Number of Students</th>
               <td id="F">0</th>
               <td id="D-">0</td>
               <td id="D">0</td>
@@ -198,6 +308,54 @@ Thank you for subscribing to our newsletter. [Your company name] team will work 
               <td id="A-">0</td>
               <td id="A">0</td>
               <td id="A+">0</td>
+            </tr>
+            <tr>
+              <th scope="row">Actual Percentage</th>
+              <td id="percent-F">0</th>
+              <td id="percent-D-">0</td>
+              <td id="percent-D">0</td>
+              <td id="percent-D+">0</td>
+              <td id="percent-C-">0</td>
+              <td id="percent-C">0</td>
+              <td id="percent-C+">0</td>
+              <td id="percent-B-">0</td>
+              <td id="percent-B">0</td>
+              <td id="percent-B+">0</td>
+              <td id="percent-A-">0</td>
+              <td id="percent-A">0</td>
+              <td id="percent-A+">0</td>
+            </tr>
+            <tr>
+              <th scope="row">Cumulative percentiles</th>
+              <td id="percentile-F"></th>
+              <td id="percentile-D-"></td>
+              <td id="percentile-D"></td>
+              <td id="percentile-D+"></td>
+              <td id="percentile-C-"></td>
+              <td id="percentile-C"></td>
+              <td id="percentile-C+"></td>
+              <td id="percentile-B-"></td>
+              <td id="percentile-B"></td>
+              <td id="percentile-B+"></td>
+              <td id="percentile-A-"></td>
+              <td id="percentile-A"></td>
+              <td id="percentile-A+"></td>
+            </tr>
+            <tr>
+              <th scope="row">Cutoff scores</th>
+              <td id="cutoff-F"></th>
+              <td id="cutoff-D-"></td>
+              <td id="cutoff-D"></td>
+              <td id="cutoff-D+"></td>
+              <td id="cutoff-C-"></td>
+              <td id="cutoff-C"></td>
+              <td id="cutoff-C+"></td>
+              <td id="cutoff-B-"></td>
+              <td id="cutoff-B"></td>
+              <td id="cutoff-B+"></td>
+              <td id="cutoff-A-"></td>
+              <td id="cutoff-A"></td>
+              <td id="cutoff-A+"></td>
             </tr>
           </tbody>
         </table>
@@ -266,14 +424,6 @@ Thank you for subscribing to our newsletter. [Your company name] team will work 
               <i class="fas fa-table"></i>
               Overall Table</div>
             <div class="card-body">
-              <div id="tableChoices" class="btn-group btn-group-toggle" data-toggle="buttons">
-                <label class="btn btn-secondary active">
-                  <input type="radio" name="table" value="1" autocomplete="off" checked>Show Student on Chart
-                </label>
-                <label class="btn btn-secondary">
-                  <input type="radio" name="table" value="2" autocomplete="off">Special Handle
-                </label>
-              </div>
               <div class="table-responsive">
                 <table class="table table-hover" id="overall-overallTable">
                 </table>
@@ -366,7 +516,7 @@ Thank you for subscribing to our newsletter. [Your company name] team will work 
     <!-- <script src="./js/chart.js"></script> -->
     <script>
     $(function() {
-      $('a[href^="#"]').on('click', function(event) {
+      $('a[href^="#start"]').on('click', function(event) {
         var target = $(this.getAttribute('href'));
         if( target.length ) {
             event.preventDefault();

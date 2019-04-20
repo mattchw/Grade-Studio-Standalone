@@ -64,7 +64,7 @@ $(document).ready(function () {
             console.log('no repeat');
 
             $('#topHeader').css('display', 'none')
-            $('#about').css('display', 'none')
+            $('#start').css('display', 'none')
             $('#fileSubmitDiv').css('display', 'block')
 
             var settingTableEl = []
@@ -284,8 +284,15 @@ $(document).ready(function () {
                 var new_data = {};
                 let overallData = [];
                 new_data.sid = outputData[i].sid;
-                new_data.score = outputData[i].score;
-                new_data.value = NormalDensityZx(scores[i], mean, stdDev);
+                res.forEach(function (student, index) {
+                  if(new_data.sid==student["sid"]){
+                      for (let j = 0; j<tabItems.length;j++){
+                        new_data[tabItems[j]]=student[tabItems[j]]
+                      }
+                  }
+                });
+                new_data.score = outputData[i].score.toFixed(2);
+                new_data.pdf = NormalDensityZx(scores[i], mean, stdDev);
                 new_data.grade = '';
                 new_data.remark = '';
                 data.push(new_data);
@@ -299,31 +306,32 @@ $(document).ready(function () {
               $('#overall-overallTable').DataTable({
                   data: data,
                   columns: [
-                    {
-                      "className":      'up-control',
-                      "width":          "20px",
-                      "orderable":      false,
-                      "data":           null,
-                      "defaultContent": ''
-                    },
-                    {
-                      "className":      'special-control',
-                      "width":          "20px",
-                      "orderable":      false,
-                      "data":           null,
-                      "defaultContent": ''
-                    },{
-                      "className":      'details-control',
-                      "width":          "20px",
-                      "orderable":      false,
-                      "data":           null,
-                      "defaultContent": ''
-                    },
+                      {
+                        "className":      'up-control',
+                        "width":          "20px",
+                        "orderable":      false,
+                        "data":           null,
+                        "defaultContent": ''
+                      },
                       { title: "SID", data: "sid" },
                       { title: "Score", data: "score" },
-                      { title: "Grade", data: "grade" }
+                      { title: "Grade", data: "grade" },
+                      {
+                        "className":      'special-control',
+                        "width":          "20px",
+                        "orderable":      false,
+                        "data":           null,
+                        "defaultContent": ''
+                      },{
+                        "className":      'details-control',
+                        "width":          "20px",
+                        "orderable":      false,
+                        "data":           null,
+                        "defaultContent": ''
+                      },
                   ],
-                  "order": [[3, 'asc']]
+                  "order": [[1, 'asc']],
+                  "pagingType": "full_numbers"
               });
               console.log(data);
               /*** overall table data ***/
@@ -339,6 +347,7 @@ $(document).ready(function () {
                 $("#gradeModal").modal("show");
                 var target = $('#overall-overallTable').DataTable().cell( this ).data();
                 console.log(target);
+                $("#remarkText").val("");
                     // e.stopPropagation();
                     $('#specialHandleApplyBtn').one('click', function(e) {
                       var text = $("#remarkText").val();
@@ -432,6 +441,16 @@ $(document).ready(function () {
     histChart.validateData();
   });
 
+  $('#suggestionCheck').change(function(){
+    if($(this).is(':checked')) {
+        // Checkbox is checked..
+        $('#suggestTable').css('display', 'block')
+    } else {
+        // Checkbox is not checked..
+        $('#suggestTable').css('display', 'none')
+    }
+  });
+
   $('#showOverallChartBtn').click(function () {
     $('#chartDiv').css('display', 'block')
     $('#gradeOption').css('display', 'block')
@@ -483,7 +502,7 @@ $(document).ready(function () {
 
       var inputWeighting = getWeighting('new');
       var inputFields = getCsvFields('new');
-      var outputData = calculateWeightedScore(res, inputWeighting, inputFields);
+      outputData = calculateWeightedScore(res, inputWeighting, inputFields);
       console.log(outputData);
 
       selectionSort(outputData);
@@ -503,8 +522,15 @@ $(document).ready(function () {
         var new_data = {};
         let overallData = [];
         new_data.sid = outputData[i].sid;
-        new_data.score = outputData[i].score;
-        new_data.value = NormalDensityZx(scores[i], mean, stdDev);
+        res.forEach(function (student, index) {
+          if(new_data.sid==student["sid"]){
+              for (let j = 0; j<inputFields.length;j++){
+                new_data[inputFields[j]]=student[inputFields[j]]
+              }
+          }
+        });
+        new_data.score = outputData[i].score.toFixed(2);
+        new_data.pdf = NormalDensityZx(scores[i], mean, stdDev);
         new_data.grade = '';
         new_data.remark = '';
         data.push(new_data);
@@ -514,13 +540,14 @@ $(document).ready(function () {
         overallData.push('');
         overallDataSet.push(overallData);
       }
+      console.log(data);
 
       let overallDataTable = $('#overall-overallTable').DataTable();
       overallDataTable.destroy(); // destroy the original datatable before reinitializing
 
       overallDataTable = $('#overall-overallTable').DataTable({
-          data: data,
-          columns: [
+        data: data,
+        columns: [
             {
               "className":      'up-control',
               "width":          "20px",
@@ -528,6 +555,9 @@ $(document).ready(function () {
               "data":           null,
               "defaultContent": ''
             },
+            { title: "SID", data: "sid" },
+            { title: "Score", data: "score" },
+            { title: "Grade", data: "grade" },
             {
               "className":      'special-control',
               "width":          "20px",
@@ -541,11 +571,9 @@ $(document).ready(function () {
               "data":           null,
               "defaultContent": ''
             },
-              { title: "SID", data: "sid" },
-              { title: "Score", data: "score" },
-              { title: "Grade", data: "grade" }
-          ],
-          "order": [[3, 'asc']]
+        ],
+        "order": [[1, 'asc']],
+        "pagingType": "full_numbers"
       });
 
       /*** update (bell curve) chart  ***/
@@ -606,13 +634,13 @@ $(document).ready(function () {
     xAxis.title.text = 'Score';
     xAxis.title.fontWeight = 600;
 
-    var meanRange = xAxis.axisRanges.create();
-    meanRange.value = mean;
-    meanRange.grid.stroke = am4core.color("#396478");
-    meanRange.grid.strokeWidth = 2;
-    meanRange.grid.strokeOpacity = 1;
-    meanRange.label.text = "Mean";
-    meanRange.label.fill = meanRange.grid.stroke;
+    // var meanRange = xAxis.axisRanges.create();
+    // meanRange.value = mean;
+    // meanRange.grid.stroke = am4core.color("#396478");
+    // meanRange.grid.strokeWidth = 2;
+    // meanRange.grid.strokeOpacity = 1;
+    // meanRange.label.text = "Mean";
+    // meanRange.label.fill = meanRange.grid.stroke;
 
     // var leftSdRange = xAxis.axisRanges.create();
     // leftSdRange.value = mean-stdDev;
@@ -631,7 +659,7 @@ $(document).ready(function () {
     // rightSdRange.label.fill = rightSdRange.grid.stroke;
 
     var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
-    yAxis.dataFields.value = 'value';
+    yAxis.dataFields.value = 'pdf';
     yAxis.min = 0;
     //yAxis.max = 0.02;
     yAxis.title.text = 'Normal Density';
@@ -639,7 +667,7 @@ $(document).ready(function () {
 
     let series = chart.series.push(new am4charts.LineSeries());
     series.dataFields.valueX = 'score';
-    series.dataFields.valueY = 'value';
+    series.dataFields.valueY = 'pdf';
     series.tooltipText = '{valueY.value}';
 
     var bullet = series.bullets.push(new am4charts.Bullet());
@@ -780,6 +808,20 @@ $(document).ready(function () {
       }
       // update area ratio
       updateAreaRatio (gradeRange, scores)
+      var scoreArr = [];
+      for (var i = scores.length-1;i>=0;i--){
+        scoreArr.push(scores[i]);
+      }
+      for (var i in gradeRange) {
+        var value = findPercentile(scoreArr,gradeRange[i].value);
+        console.log("percentile: "+findPercentile(scoreArr,gradeRange[i].value));
+        $('#gradeTable #percentile-'+gradeRange[i].label.text).html(value*100+"%");
+        if(gradeRange[i].value<scoreArr[scoreArr.length-1]){
+          $('#gradeTable #cutoff-'+gradeRange[i].label.text).html((scoreArr[scoreArr.length-1]).toFixed(2));
+        } else {
+          $('#gradeTable #cutoff-'+gradeRange[i].label.text).html((gradeRange[i].value).toFixed(2));
+        }
+      }
     });
 
     let scrollbarX = new am4charts.XYChartScrollbar();
@@ -1148,6 +1190,33 @@ function percentile(arr, p) {
     if (upper >= arr.length) return arr[lower];
     return arr[lower] * (1 - weight) + arr[upper] * weight;
 }
+function findPercentile(arr, point) {
+  var index1 = 0;
+  var index2 = 0;
+  var p = 0;
+  for (let i =0;i<arr.length;i++){
+    if (point>arr[i]){
+      index1=i-1;
+      index2=i;
+      break;
+    } else if (point==arr[i]){
+      index1=i;
+      index2=i;
+      break;
+    }
+  }
+  console.log(point);
+  console.log(index1);
+  console.log(index2);
+  var diff1 = arr[index1] - arr[index2];
+  var diff2 = arr[index1] - point;
+  if (diff1==0){
+    return 1;
+  }
+  var weight = diff2/diff1;
+  p = (weight + index1)/arr.length;
+  return round(p,4);
+}
 
 /*** Chart Function ***/
 function selectColor (label) {
@@ -1239,55 +1308,45 @@ function updateAreaRatio (gradeRange, scores) {
     })
     var num = count
     $('#gradeTable #'+gradeRange[i].label.text).html(num);
+    $('#gradeTable #percent-'+gradeRange[i].label.text).html((num/scores.length*100).toFixed(2)+"%");
   }
 }
 function suggestArea (chart, am4core, gradeRange, series, outputData, max, min) {
+  var finalUseObj = {};
+  var gradePercentage = {};
+  $('#suggestTable > tbody > tr').each(function() {
+    var grade = $(this).find("th").text();
+    var value = $(this).find("td").find("input").val();
+    console.log("grade "+grade);
+    console.log("value "+value);
+    if (value > 0){
+      gradePercentage[grade] = value/100;
+    }
+  });
+  console.log(gradePercentage);
+  if (!jQuery.isEmptyObject(gradePercentage)){
+    finalUseObj = gradePercentage;
+  } else {
+    finalUseObj = CUHKgradePercentage;
+  }
   let gradeCutOff = [];
   //let MaxMinProb = probabilityBetween(max, min, mean, stdDev);
   console.log(outputData);
   var scoreArr = [];
-  var distArr = [];
   for (var i = outputData.length-1;i>=0;i--){
     scoreArr.push(outputData[i].score);
-    if((i-1)>=0){
-      distArr.push((outputData[i].score-outputData[i-1].score));
-    }
   }
   console.log(scoreArr);
-  console.log(distArr);
-  var total = 0;
-  for (var i = 0;i<distArr.length;i++){
-    total += distArr[i];
-  }
-  console.log("average dist: "+(total / distArr.length));
   var gradeArr = [];
   var tmpCum = [];
-  for (var grade in CUHKgradePercentage){
+  for (var grade in finalUseObj){
     console.log(grade);
     gradeArr.push(grade);
-    console.log(CUHKgradePercentage[grade]);
-    tmpCum.push(CUHKgradePercentage[grade]);
-    console.log(percentile(scoreArr,CUHKgradePercentage[grade]))
-    gradeCutOff.push(percentile(scoreArr,CUHKgradePercentage[grade]));
+    console.log(finalUseObj[grade]);
+    tmpCum.push(finalUseObj[grade]);
+    console.log(percentile(scoreArr,finalUseObj[grade]))
+    gradeCutOff.push(percentile(scoreArr,finalUseObj[grade]));
   }
-  // for (var i =0;i<tmpCum.length;i++){
-  //   if(i==0){
-  //     tmpCum[i]=tmpCum[i]/2;
-  //   } else if (i==tmpCum.length-1){
-  //     tmpCum[i]=tmpCum[i];
-  //   } else {
-  //     tmpCum[i]=(tmpCum[i]+tmpCum[i-1])/2;
-  //   }
-  // }
-  // console.log(tmpCum);
-  // console.log(gradeArr);
-  // console.log(gradeCutOff);
-  // for (var i = 0;i<tmpCum.length;i++){
-  //   console.log(gradeArr[i]);
-  //   console.log(tmpCum[i]);
-  //   console.log(percentile(scoreArr,tmpCum[i]));
-  //   gradeCutOff.push(percentile(scoreArr,tmpCum[i]));
-  // }
   for(var i=0;i<gradeCutOff.length;i++){
     console.log(gradeArr[i])
     if(i==0){
@@ -1299,6 +1358,17 @@ function suggestArea (chart, am4core, gradeRange, series, outputData, max, min) 
     }
     updateAreaRatio(gradeRange,scoreArr);
   }
+  for (var i in gradeRange) {
+    var value = findPercentile(scoreArr,gradeRange[i].value);
+    console.log("percentile: "+findPercentile(scoreArr,gradeRange[i].value));
+    $('#gradeTable #percentile-'+gradeRange[i].label.text).html(value*100+"%");
+    if(gradeRange[i].value<scoreArr[scoreArr.length-1]){
+      $('#gradeTable #cutoff-'+gradeRange[i].label.text).html((scoreArr[scoreArr.length-1]).toFixed(2));
+    } else {
+      $('#gradeTable #cutoff-'+gradeRange[i].label.text).html((gradeRange[i].value).toFixed(2));
+    }
+  }
+
 }
 
 function moveCursor (chart, sid) {

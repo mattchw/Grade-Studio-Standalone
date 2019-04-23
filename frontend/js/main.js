@@ -1211,7 +1211,8 @@ function findPercentile(arr, point) {
   var diff1 = arr[index1] - arr[index2];
   var diff2 = arr[index1] - point;
   if (diff1==0){
-    return 1;
+    diff1 = 1;
+    diff2 = 1;
   }
   var weight = diff2/diff1;
   p = (weight + index1)/arr.length;

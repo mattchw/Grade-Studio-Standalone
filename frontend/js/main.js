@@ -374,6 +374,7 @@ $(document).ready(function () {
                             } );
                           }
                           $('#overall-overallTable').DataTable().draw();
+                          alert('Special handle done.')
                     });
               } );
 
@@ -488,141 +489,160 @@ $(document).ready(function () {
 
   $('#gradeApplyBtn').click(function () {
     //console.log(gradeRange);
+    alert('Grades are applied.')
     setGrade (chart, gradeRange);
   })
 
   $('#changeWeightingBtn').click(function () {
-    $.ajax({
-      url: 'http://localhost:3000/getfile/' + $('#filename').val(),
-      type: 'GET',
-      contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
-      processData: false // NEEDED, DON'T OMIT THIS
-    }).done(function (res) {
-      console.log(res);
-
-      var inputWeighting = getWeighting('new');
-      var inputFields = getCsvFields('new');
-      outputData = calculateWeightedScore(res, inputWeighting, inputFields);
-      console.log(outputData);
-
-      selectionSort(outputData);
-      let data = [];
-
-      scores.length = 0;  // empty original scores array
-      for (let i in outputData) {
-        scores.push(Number(outputData[i].score));
+    var newTableWeighting = 0;
+    $('table#changeSettingTable tr input').each(function () {
+      if (isNaN(parseInt($(this).val())) === false) {
+        let percentage = parseInt($(this).val());
+        newTableWeighting += percentage;
       }
+    });
+    console.log(newTableWeighting);
+    if (newTableWeighting > 100) {
+      alert('Total weighting over 100%. Please check again.');
+    } else if (newTableWeighting <= 0) {
+      alert('Wrong Weighting! Please Check Again.');
+    } else if (newTableWeighting !== 100) {
+      alert('Toal weighting not equal to 100%. Please check again.');
+    } else {
+      $.ajax({
+        url: 'http://localhost:3000/getfile/' + $('#filename').val(),
+        type: 'GET',
+        contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+        processData: false // NEEDED, DON'T OMIT THIS
+      }).done(function (res) {
+        console.log(res);
 
-      /*** update stat data (overall) ***/
-      setOverallStat();
+        var inputWeighting = getWeighting('new');
+        var inputFields = getCsvFields('new');
+        outputData = calculateWeightedScore(res, inputWeighting, inputFields);
+        console.log(outputData);
 
-      /*** update overall-overallTable ***/
-      let overallDataSet = [];
-      for (let i = 0; i < outputData.length; i++) {
-        var new_data = {};
-        let overallData = [];
-        new_data.sid = outputData[i].sid;
-        res.forEach(function (student, index) {
-          if(new_data.sid==student["sid"]){
-              for (let j = 0; j<inputFields.length;j++){
-                new_data[inputFields[j]]=student[inputFields[j]]
-              }
-          }
-        });
-        new_data.score = outputData[i].score.toFixed(2);
-        new_data.pdf = NormalDensityZx(scores[i], mean, stdDev);
-        new_data.grade = '';
-        new_data.remark = '';
-        data.push(new_data);
+        selectionSort(outputData);
+        let data = [];
 
-        overallData.push(outputData[i].sid);
-        overallData.push(outputData[i].score.toFixed(2));
-        overallData.push('');
-        overallDataSet.push(overallData);
-      }
-      console.log(data);
+        scores.length = 0;  // empty original scores array
+        for (let i in outputData) {
+          scores.push(Number(outputData[i].score));
+        }
 
-      let overallDataTable = $('#overall-overallTable').DataTable();
-      overallDataTable.destroy(); // destroy the original datatable before reinitializing
+        /*** update stat data (overall) ***/
+        setOverallStat();
 
-      overallDataTable = $('#overall-overallTable').DataTable({
-        data: data,
-        columns: [
-            {
-              "className":      'up-control',
-              "width":          "20px",
-              "orderable":      false,
-              "data":           null,
-              "defaultContent": ''
-            },
-            { title: "SID", data: "sid" },
-            { title: "Score", data: "score" },
-            { title: "Grade", data: "grade" },
-            {
-              "className":      'special-control',
-              "width":          "20px",
-              "orderable":      false,
-              "data":           null,
-              "defaultContent": ''
-            },{
-              "className":      'details-control',
-              "width":          "20px",
-              "orderable":      false,
-              "data":           null,
-              "defaultContent": ''
-            },
-        ],
-        "order": [[1, 'asc']],
-        "pagingType": "full_numbers"
-      });
-
-      /*** update (bell curve) chart  ***/
-      chart.data = data;
-      chart.validateData();
-
-      /*** update weightingChart ***/
-      weightingChart.data = calculateWeightChartData(inputWeighting, inputFields);
-      weightingChart.validateData();
-
-      /*** update histChart ***/
-
-      let histMax = Math.ceil(max/5)*5;
-      let histMin = Math.floor(min/5)*5;
-      console.log("max: "+histMax+" min: "+histMin);
-      let binNum = 10;
-      let binSize = (histMax - histMin)/binNum;
-      console.log("bin size: "+binSize)
-
-      let histData = [];
-      for (let i = 0; i < binNum; i++){
-        var new_data = {};
-        new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
-        new_data.frequency = 0;
-        histData.push(new_data);
-      }
-
-      for (let i = 0; i < outputData.length; i++) {
-        for (let j = 0; j < binNum; j++){
-          let minBoundary = parseFloat(histData[j].boundary)
-          if (j!=binNum-1) {
-            let maxBoundary = parseFloat(histData[j+1].boundary)
-            if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
-              histData[j].frequency = histData[j].frequency+1;
-              break;
+        /*** update overall-overallTable ***/
+        let overallDataSet = [];
+        for (let i = 0; i < outputData.length; i++) {
+          var new_data = {};
+          let overallData = [];
+          new_data.sid = outputData[i].sid;
+          res.forEach(function (student, index) {
+            if(new_data.sid==student["sid"]){
+                for (let j = 0; j<inputFields.length;j++){
+                  new_data[inputFields[j]]=student[inputFields[j]]
+                }
             }
-          } else {
-            if (outputData[i].score>=minBoundary) {
-              histData[j].frequency = histData[j].frequency+1;
-              break;
+          });
+          new_data.score = outputData[i].score.toFixed(2);
+          new_data.pdf = NormalDensityZx(scores[i], mean, stdDev);
+          new_data.grade = '';
+          new_data.remark = '';
+          data.push(new_data);
+
+          overallData.push(outputData[i].sid);
+          overallData.push(outputData[i].score.toFixed(2));
+          overallData.push('');
+          overallDataSet.push(overallData);
+        }
+        console.log(data);
+
+        let overallDataTable = $('#overall-overallTable').DataTable();
+        overallDataTable.destroy(); // destroy the original datatable before reinitializing
+
+        overallDataTable = $('#overall-overallTable').DataTable({
+          data: data,
+          columns: [
+              {
+                "className":      'up-control',
+                "width":          "20px",
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+              },
+              { title: "SID", data: "sid" },
+              { title: "Score", data: "score" },
+              { title: "Grade", data: "grade" },
+              {
+                "className":      'special-control',
+                "width":          "20px",
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+              },{
+                "className":      'details-control',
+                "width":          "20px",
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+              },
+          ],
+          "order": [[1, 'asc']],
+          "pagingType": "full_numbers"
+        });
+
+        /*** update (bell curve) chart  ***/
+        chart.data = data;
+        chart.validateData();
+
+        /*** update weightingChart ***/
+        weightingChart.data = calculateWeightChartData(inputWeighting, inputFields);
+        weightingChart.validateData();
+
+        /*** update histChart ***/
+
+        let histMax = Math.ceil(max/5)*5;
+        let histMin = Math.floor(min/5)*5;
+        console.log("max: "+histMax+" min: "+histMin);
+        let binNum = 10;
+        let binSize = (histMax - histMin)/binNum;
+        console.log("bin size: "+binSize)
+
+        let histData = [];
+        for (let i = 0; i < binNum; i++){
+          var new_data = {};
+          new_data.boundary = (histMin+(i*binSize)).toFixed(2).toString()
+          new_data.frequency = 0;
+          histData.push(new_data);
+        }
+
+        for (let i = 0; i < outputData.length; i++) {
+          for (let j = 0; j < binNum; j++){
+            let minBoundary = parseFloat(histData[j].boundary)
+            if (j!=binNum-1) {
+              let maxBoundary = parseFloat(histData[j+1].boundary)
+              if (outputData[i].score>=minBoundary&&outputData[i].score<maxBoundary) {
+                histData[j].frequency = histData[j].frequency+1;
+                break;
+              }
+            } else {
+              if (outputData[i].score>=minBoundary) {
+                histData[j].frequency = histData[j].frequency+1;
+                break;
+              }
             }
           }
         }
-      }
-      /*** histogram data ***/
-      histChart.data = histData
-      histChart.validateData();
+        /*** histogram data ***/
+        histChart.data = histData
+        histChart.validateData();
 
-    });
+      });
+
+      alert('New weighting applied.')
+    }
   })
 
   function initChart() {
@@ -815,7 +835,10 @@ $(document).ready(function () {
       for (var i in gradeRange) {
         var value = findPercentile(scoreArr,gradeRange[i].value);
         console.log("percentile: "+findPercentile(scoreArr,gradeRange[i].value));
-        $('#gradeTable #percentile-'+gradeRange[i].label.text).html(value*100+"%");
+        let cumPercentile = value * 100;
+        console.log(cumPercentile.toFixed(2));
+        // $('#gradeTable #percentile-'+gradeRange[i].label.text).html(value*100 + "%");
+        $('#gradeTable #percentile-'+gradeRange[i].label.text).html(cumPercentile.toFixed(2) + "%");
         if(gradeRange[i].value<scoreArr[scoreArr.length-1]){
           $('#gradeTable #cutoff-'+gradeRange[i].label.text).html((scoreArr[scoreArr.length-1]).toFixed(2));
         } else {

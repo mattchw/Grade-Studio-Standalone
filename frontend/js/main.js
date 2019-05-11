@@ -121,10 +121,12 @@ $(document).ready(function () {
             if (tableWeighting > 100) {
               alert('Total weighting over 100%. Please check again.');
             } else if (tableWeighting <= 0) {
-              alert('Wrong Weighting! Please Check Again.');
+              alert('Weighting cannot be negative! Please Check Again.');
             } else if (tableWeighting !== 100) {
-              alert('Toal weighting not equal to 100%. Please check again.');
-            } else {
+              var isProceed = confirm('Toal weighting not equal to 100%. Are you sure?');
+            }
+
+            if (tableWeighting == 100 || isProceed) {
               /*** calculate weighted score ***/
               var inputWeighting = getWeighting();
               var inputFields = getCsvFields();

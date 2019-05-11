@@ -75,11 +75,6 @@ $(document).ready(function () {
                   <select class="form-control columnTypeSelect" onchange="selectOnchange(this)">
                     <option value="ignore">Ignore</option>
                     <option value="sid">Student ID</option>
-                    <option value="assignment">Assignment</option>
-                    <option value="quiz">Quiz/Test</option>
-                    <option value="midterm">Midterm</option>
-                    <option value="proj">Project</option>
-                    <option value="final">Final</option>
                     <option value="overall">Overall</option>
                   </select>
                 </td>

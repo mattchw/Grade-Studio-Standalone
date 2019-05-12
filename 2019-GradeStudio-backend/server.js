@@ -26,7 +26,7 @@ app.post('/uploadfile', function (req, res, next) {
   let importfile = req.files.importfile
 
   if (importfile.mimetype !== 'text/csv') {
-    res.status(403).sendFile(__dirname + '/views/403.html')
+    res.status(403)
   }
 
   // Use the mv() method to place the file somewhere on your server
@@ -74,7 +74,7 @@ app.get('/getfile/:filename', function (req, res) {
 })
 
 app.use('*',function(req,res){
-  res.sendFile(__dirname + '/views/404.html').status(404);
+  res.status(404);
 })
 
 app.listen(3000, function () {

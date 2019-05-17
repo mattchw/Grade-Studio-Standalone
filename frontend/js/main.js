@@ -75,7 +75,7 @@ $(document).ready(function () {
                   <select class="form-control columnTypeSelect" onchange="selectOnchange(this)">
                     <option value="ignore">Ignore</option>
                     <option value="sid">Student ID</option>
-                    <option value="overall">Overall</option>
+                    <option value="tobegrade">To be graded</option>
                   </select>
                 </td>
                 <td>
